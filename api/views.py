@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import *
 from .serializers import *
+from .permissions import *
 from datetime import date, timedelta
 import os
 import calendar
@@ -59,7 +60,9 @@ class UserDetail(APIView):
         return Response(status=HTTP_204_NO_CONTENT)
 
 class GetUser(APIView):
+    permission_classes = [IsAuthenticated,]
     def get(self, request, format = None):
-        user = User.objects.get(auth_user = request.user)
+        print(request.user)
+        user = User.objects.get(auth_user = request.user.pk)
         serializer = UserSerializer(user)
         return Response(serializer.data)
