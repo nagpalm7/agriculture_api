@@ -2,7 +2,7 @@ env
 db.sqlite3
 *.pyc
 media
-myenv
+myvenv
 requirements.txt.save
 agriculture/static
 
