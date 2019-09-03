@@ -20,6 +20,12 @@ class User(models.Model):
             return str(self.name)
         else:
             return self.auth_user.username
+
+    def save(self, *args, **kwargs):
+        if self.district:
+            self.district = self.district.lower()
+        return super(User, self).save(*args, **kwargs)
+        
     class Meta:
         ordering = ["name"]
 
