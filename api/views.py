@@ -2,15 +2,18 @@ from rest_framework import status
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import viewsets, filters
 from .models import *
 from .serializers import *
 from .permissions import *
+from .paginators import *
 import datetime
 from agriculture.settings import MEDIA_ROOT
 from django.core.files.storage import FileSystemStorage
 import os
 
 class UserList(APIView):
+    pagination_class = StandardResultsSetPagination
     def get(self, request, format = None):
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
@@ -67,12 +70,24 @@ class GetUser(APIView):
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
+# Shows list of students (permitted to a superadmin only)
+class LocationViewSet(viewsets.ReadOnlyModelViewSet):
+    model = Location
+    serializer_class = LocationSerializer
+    # permission_classes = (permissions.IsAuthenticated, IsSuperadmin, )
+    pagination_class = StandardResultsSetPagination
+    # Making endpoint searchable
+    # filter_backends = (filters.SearchFilter, )
+    # search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
+
+    def get_queryset(self):
+        print(self.request.data, self.kwargs)
+        stat = self.kwargs['status']
+        locations = Location.objects.filter(status=stat)
+        return locations
+
 class LocationList(APIView):
     permission_classes = []
-    def get(self, request, format = None):
-        Location = Location.objects.all()
-        serializer = LocationSerializer(Location, many=True)
-        return Response(serializer.data)
 
     def post(self, request, format = None):
         directory = MEDIA_ROOT + '/locationCSVs/'
