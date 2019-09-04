@@ -10,6 +10,7 @@ urlpatterns = [
     path('api/locations/<str:status>', views.LocationViewSet.as_view({'get': 'list'}), name='admin-location-list'),
     path('api/locations/ado/<str:status>', views.LocationViewSetAdo.as_view({'get': 'list'}), name='ado-location-list'),
     path('api/locations/dda/<str:status>', views.LocationViewSetDda.as_view({'get': 'list'}), name='dda-location-list'),
+    path('api/ado/', views.AdoViewSet.as_view({'get': 'list'}), name='ado-list'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

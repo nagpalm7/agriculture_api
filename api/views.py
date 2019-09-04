@@ -141,6 +141,25 @@ class LocationViewSetDda(viewsets.ReadOnlyModelViewSet):
             locations = Location.objects.filter(status=stat, dda=user)
         return locations
 
+# Shows list of ado for specific dda
+class AdoViewSet(viewsets.ReadOnlyModelViewSet):
+    model = User
+    serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated, )
+    pagination_class = StandardResultsSetPagination
+    # Making endpoint searchable
+    # filter_backends = (filters.SearchFilter, )
+    # search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
+
+    def get_queryset(self):
+        try:
+            user = User.objects.get(auth_user=self.request.user.pk)
+        except User.DoesNotExist:
+            Raise(HTTP_400_BAD_REQUEST)
+        print(user.auth_user)
+        ados = User.objects.filter(dda_head = user, typeOfUser='ado')
+        return ados
+
 class LocationList(APIView):
     permission_classes = []
 
