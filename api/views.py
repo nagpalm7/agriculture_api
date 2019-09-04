@@ -132,7 +132,7 @@ class LocationViewSetAdo(viewsets.ReadOnlyModelViewSet):
         try:
             user = User.objects.get(auth_user=self.request.user.pk)
         except User.DoesNotExist:
-            Raise(HTTP_400_BAD_REQUEST)
+            raise Http404
         stat = self.kwargs['status']
         locations = []
         if stat == 'pending':
@@ -155,7 +155,7 @@ class LocationViewSetDda(viewsets.ReadOnlyModelViewSet):
         try:
             user = User.objects.get(auth_user=self.request.user.pk)
         except User.DoesNotExist:
-            Raise(HTTP_400_BAD_REQUEST)
+            raise Http404
         stat = self.kwargs['status']
         locations = []
         if stat == 'unassigned':
@@ -182,11 +182,12 @@ class AdoViewSet(viewsets.ReadOnlyModelViewSet):
         try:
             user = User.objects.get(auth_user=self.request.user.pk)
         except User.DoesNotExist:
-            Raise(HTTP_400_BAD_REQUEST)
+            raise Http404
         print(user.auth_user)
         ados = User.objects.filter(dda_head = user, typeOfUser='ado')
         return ados
 
+# Upload CSV
 class LocationList(APIView):
     permission_classes = []
 
@@ -234,3 +235,53 @@ class LocationList(APIView):
                     print("added", count)
             return Response({'status': 'success', 'count': count}, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
+# Shows list of locations for specific ado for admin
+class LocationViewSetAdoForAdmin(viewsets.ReadOnlyModelViewSet):
+    model = Location
+    serializer_class = LocationSerializer
+    permission_classes = (IsAuthenticated, )
+    pagination_class = StandardResultsSetPagination
+    # Making endpoint searchable
+    # filter_backends = (filters.SearchFilter, )
+    # search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
+
+    def get_queryset(self):
+        try:
+            user = User.objects.get(id=self.kwargs['pk'])
+        except User.DoesNotExist:
+            raise Http404
+        stat = self.kwargs['status']
+        locations = []
+        if stat == 'pending':
+            locations = Location.objects.filter(status=stat, ado=user)
+        elif stat == 'completed':
+            locations = Location.objects.filter(status__in=['completed', 'ongoing'], ado=user)
+        return locations
+
+# Shows list of locations for specific dda for admin
+class LocationViewSetDdaForAdmin(viewsets.ReadOnlyModelViewSet):
+    model = Location
+    serializer_class = LocationSerializer
+    permission_classes = (IsAuthenticated, )
+    pagination_class = StandardResultsSetPagination
+    # Making endpoint searchable
+    # filter_backends = (filters.SearchFilter, )
+    # search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
+
+    def get_queryset(self):
+        try:
+            user = User.objects.get(id=self.kwargs['pk'])
+        except User.DoesNotExist:
+            raise Http404
+        stat = self.kwargs['status']
+        locations = []
+        if stat == 'unassigned':
+            locations = Location.objects.filter(status='pending', dda=user ,ado=None)
+        elif stat == 'assigned':
+            locations = Location.objects.filter(status='pending', dda=user).exclude(ado=None)
+        elif stat == 'ongoing':
+            locations = Location.objects.filter(status=stat, dda=user)
+        elif stat == 'completed':
+            locations = Location.objects.filter(status=stat, dda=user)
+        return locations
