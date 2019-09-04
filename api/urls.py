@@ -6,6 +6,8 @@ urlpatterns = [
     path('api/user/', views.UserList.as_view(), name='user-list'),
     path('api/get-user/', views.GetUser.as_view(), name='get-user'),
     path('api/user/<int:pk>/', views.UserDetail.as_view(), name='user-detail'),
+    path('api/upload/locations/', views.LocationList.as_view(), name='user-detail'),
+    path('api/locations/<str:status>', views.LocationViewSet.as_view({'get': 'list'})),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
