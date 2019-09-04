@@ -11,6 +11,7 @@ import datetime
 from agriculture.settings import MEDIA_ROOT
 from django.core.files.storage import FileSystemStorage
 import os
+from django.db.models import Q
 
 class UserList(APIView):
     pagination_class = StandardResultsSetPagination
@@ -83,7 +84,12 @@ class LocationViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         print(self.request.data, self.kwargs)
         stat = self.kwargs['status']
-        locations = Location.objects.filter(status=stat)
+        if stat == 'unassigned':
+            locations = Location.objects.filter(status='pending', ado=None)
+        elif stat == 'assigned':
+            locations = Location.objects.filter(status='pending').exclude(ado=None)
+        else:
+            locations = Location.objects.filter(status=stat)
         return locations
 
 class LocationList(APIView):
