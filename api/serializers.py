@@ -16,4 +16,20 @@ class UserSerializer(serializers.ModelSerializer):
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
-        fields = '__all__'        
+        fields = '__all__'   
+
+class AdminSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Admin
+        fields = '__all__'
+
+class AdoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ado
+        fields = '__all__'
+
+class DdoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ddo
+        fields = '__all__'                             
+
