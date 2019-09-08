@@ -285,7 +285,7 @@ class LocationList(APIView):
                 try:
                     dda = Dda.objects.get(district=data[1].lower())
                     print(dda)
-                    request.data['dda'] = dda.pk
+                    request.data['dda'] = dda
                 except Dda.DoesNotExist:
                     if 'dda' in request.data:
                         del request.data['dda']
@@ -293,7 +293,7 @@ class LocationList(APIView):
                 try:
                     ado = Ado.objects.get(village_name=data[3].lower())
                     print(ado)
-                    request.data['ado'] = ado.pk
+                    request.data['ado'] = ado
                 except Ado.DoesNotExist:
                     if 'ado' in request.data:
                         del request.data['ado']

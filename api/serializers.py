@@ -14,19 +14,19 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['pk', 'username', 'type_of_user',]   
 
 class AdminSerializer(serializers.ModelSerializer):
-    auth_user = UserSerializer(read_only=True)
+    auth_user = UserSerializer()
     class Meta:
         model = Admin
         fields = '__all__'
 
 class DdaSerializer(serializers.ModelSerializer):
-    auth_user = UserSerializer(read_only=True)
+    auth_user = UserSerializer()
     class Meta:
         model = Dda
         fields = '__all__'
 
 class AdoSerializer(serializers.ModelSerializer):
-    auth_user = UserSerializer(read_only=True)
+    auth_user = UserSerializer()
     dda = DdaSerializer()
     class Meta:
         model = Ado
@@ -34,8 +34,8 @@ class AdoSerializer(serializers.ModelSerializer):
 
 
 class LocationSerializer(serializers.ModelSerializer):
-    ado = AdoSerializer(read_only=True)
-    dda = DdaSerializer(read_only=True)
+    ado = AdoSerializer(required = False)
+    dda = DdaSerializer(required = False)
     class Meta:
         model = Location
         fields = '__all__'                        
