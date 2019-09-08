@@ -11,28 +11,32 @@ from rest_framework.exceptions import ValidationError
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
-
-class LocationSerializer(serializers.ModelSerializer):
-    ado = UserSerializer()
-    dda = UserSerializer()
-    
-    class Meta:
-        model = Location
-        fields = '__all__'   
+        fields = ['pk', 'username', 'type_of_user',]   
 
 class AdminSerializer(serializers.ModelSerializer):
+    auth_user = UserSerializer()
     class Meta:
         model = Admin
         fields = '__all__'
 
+class DdaSerializer(serializers.ModelSerializer):
+    auth_user = UserSerializer()
+    class Meta:
+        model = Dda
+        fields = '__all__'
+
 class AdoSerializer(serializers.ModelSerializer):
+    auth_user = UserSerializer()
+    dda = DdaSerializer()
     class Meta:
         model = Ado
         fields = '__all__'
 
-class DdaSerializer(serializers.ModelSerializer):
+
+class LocationSerializer(serializers.ModelSerializer):
+    ado = AdoSerializer()
+    dda = DdaSerializer()
     class Meta:
-        model = Dda
-        fields = '__all__'                             
+        model = Location
+        fields = '__all__'                        
 

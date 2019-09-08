@@ -79,7 +79,7 @@ class Dda(models.Model):
     def save(self, *args, **kwargs):
         if self.district:
             self.district = self.district.lower()
-        return super(User, self).save(*args, **kwargs)
+        return super(Dda, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.name + ' (' + self.district + ')')
@@ -96,7 +96,7 @@ class Ado(models.Model):
     def save(self, *args, **kwargs):
         if self.village_name:
             self.village_name = self.village_name.lower()
-        return super(User, self).save(*args, **kwargs)
+        return super(Ado, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.name + ' (' + self.village_name + ')')
