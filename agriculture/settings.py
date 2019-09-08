@@ -112,6 +112,9 @@ REST_FRAMEWORK = {
     ],
 }
 
+#Custom user
+AUTH_USER_MODEL = 'api.User'
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 

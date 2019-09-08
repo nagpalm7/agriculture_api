@@ -14,6 +14,9 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class LocationSerializer(serializers.ModelSerializer):
+    ado = UserSerializer()
+    dda = UserSerializer()
+    
     class Meta:
         model = Location
         fields = '__all__'   
@@ -28,8 +31,8 @@ class AdoSerializer(serializers.ModelSerializer):
         model = Ado
         fields = '__all__'
 
-class DdoSerializer(serializers.ModelSerializer):
+class DdaSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Ddo
+        model = Dda
         fields = '__all__'                             
 
