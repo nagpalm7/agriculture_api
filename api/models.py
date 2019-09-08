@@ -131,7 +131,7 @@ class Location(models.Model):
     latitude = models.CharField(max_length = 100, blank = False, null = False, unique = False)
     acq_date = models.DateField(default = timezone.now)
     acq_time = models.TimeField(default = timezone.now)
-    dda = models.ForeignKey(Dda, on_delete = models.CASCADE, blank = True, null = True, related_name = 'location_dda')        
+    dda = models.ForeignKey(Dda, on_delete = models.CASCADE, blank = True, null = True, default = None, related_name = 'location_dda')        
     ado = models.ForeignKey(Ado, on_delete = models.CASCADE, limit_choices_to={'typeOfUser': 'ado'}, blank = True, null = True, default = None, related_name = 'location_ado')
     status = models.CharField(max_length = 10, choices = choices_status, default = 'pending')
     # csv_file = models.FileField(
