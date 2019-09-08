@@ -34,8 +34,8 @@ class AdoSerializer(serializers.ModelSerializer):
 
 
 class LocationSerializer(serializers.ModelSerializer):
-    ado = AdoSerializer(required = False)
-    dda = DdaSerializer(required = False)
+    ado = AdoSerializer()
+    dda = DdaSerializer()
     class Meta:
         model = Location
         fields = '__all__'                        
