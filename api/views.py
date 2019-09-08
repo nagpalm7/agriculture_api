@@ -283,11 +283,18 @@ class LocationList(APIView):
                 request.data['acq_time'] = data[7].split('.')[0]
                 # request.data['csv_file'] = MEDIA_ROOT + 'locationCSVs/' + request.data['location_csv'].name
                 try:
-                    dda = User.objects.get(typeOfUser = 'dda', district=data[1].lower())
+                    dda = Dda.objects.get(auth_user__type_of_user = 'dda', district=data[1].lower())
                     request.data['dda'] = dda.pk
-                except User.DoesNotExist:
+                except Dda.DoesNotExist:
                     if 'dda' in request.data:
                         del request.data['dda']
+
+                try:
+                    ado = Ado.objects.get(auth_user__type_of_user = 'ado', village_name=data[3].lower())
+                    request.data['dda'] = dda.pk
+                except Ado.DoesNotExist:
+                    if 'ado' in request.data:
+                        del request.data['ado']
                 # print("dda", request.data['csv_file'])
                 serializer = LocationSerializer(data=request.data)
                 if serializer.is_valid():
@@ -309,8 +316,8 @@ class LocationViewSetAdoForAdmin(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         try:
-            user = User.objects.get(id=self.kwargs['pk'])
-        except User.DoesNotExist:
+            user = Ado.objects.get(id=self.kwargs['pk'])
+        except Ado.DoesNotExist:
             raise Http404
         stat = self.kwargs['status']
         locations = []
@@ -332,8 +339,8 @@ class LocationViewSetDdaForAdmin(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         try:
-            user = User.objects.get(id=self.kwargs['pk'])
-        except User.DoesNotExist:
+            user = Dda.objects.get(id=self.kwargs['pk'])
+        except Dda.DoesNotExist:
             raise Http404
         stat = self.kwargs['status']
         locations = []
