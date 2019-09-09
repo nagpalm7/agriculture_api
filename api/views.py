@@ -284,27 +284,22 @@ class LocationList(APIView):
                 # request.data['csv_file'] = MEDIA_ROOT + 'locationCSVs/' + request.data['location_csv'].name
                 try:
                     dda = Dda.objects.get(district=data[1].lower())
-                    print(dda)
-                    request.data['dda'] = dda
+                    request.data['dda'] = dda.pk
                 except Dda.DoesNotExist:
                     if 'dda' in request.data:
                         del request.data['dda']
 
                 try:
                     ado = Ado.objects.get(village_name=data[3].lower())
-                    print(ado)
-                    request.data['ado'] = ado
+                    request.data['ado'] = ado.pk
                 except Ado.DoesNotExist:
                     if 'ado' in request.data:
                         del request.data['ado']
                 # print("dda", request.data['csv_file'])
-                serializer = LocationSerializer(data=request.data)
+                serializer = AddLocationSerializer(data=request.data)
                 if serializer.is_valid():
                     serializer.save()
                     count = count + 1;
-                    print("added", count)
-                print("errors", serializer.errors)
-                print(request.data)
             return Response({'status': 'success', 'count': count}, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
