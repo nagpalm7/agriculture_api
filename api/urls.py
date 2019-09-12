@@ -21,6 +21,11 @@ urlpatterns = [
     path('api/admin/dda/<int:pk>/<str:status>', views.LocationViewSetDdaForAdmin.as_view({'get': 'list'}), name='admin-dda-location-list'),
     # List of ados under a specific dda logged in
     path('api/ado/', views.AdoViewSet.as_view({'get': 'list'}), name='ado-list'),
+    # Ado report and image views
+    path('api/report-ado/<int:pk>/', views.AdoReportDetail.as_view(), name='ado-report-detail'),
+    path('api/report-ado/add/', views.AddAdoReport.as_view(), name='add-ado-report'),
+    path('api/upload/images/', views.ImageView.as_view(), name='upload-images'),
+
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

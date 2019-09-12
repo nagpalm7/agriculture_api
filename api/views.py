@@ -352,3 +352,60 @@ class LocationViewSetDdaForAdmin(viewsets.ReadOnlyModelViewSet):
         elif stat == 'completed':
             locations = Location.objects.filter(status=stat, dda=user)
         return locations
+
+
+# Add images with ado reports
+class ImageView(APIView):
+
+    def get(self, request, format = None):
+        images = Image.objects.all()
+        serializer = ImageSerializer(images, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format = None):
+        print(request.data)
+        serializer = AddImageSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# ADO reports Views
+class AddAdoReport(APIView):
+
+    def post(self, request, format = None):
+        serializer = AddAdoReportSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            print(request.data)
+            location = Location.objects.get(pk=request.data['location'])
+            location.status = 'ongoing'
+            location.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AdoReportDetail(APIView):
+    # Helper function
+    def get_object(self, pk):
+        try:
+            return AdoReport.objects.get(pk=pk)
+        except AdoReport.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format = None):
+        report = self.get_object(pk)
+        serializer = AdoReportSerializer(report, context={'request': request})        
+        return Response(serializer.data)
+
+    def put(self, request, pk, format = None):
+        report = self.get_object(pk)
+        serializer = AddAdoReportSerializer(report, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format = None):
+        report = self.get_object(pk)
+        report.delete()
+        return Response(status=HTTP_204_NO_CONTENT)

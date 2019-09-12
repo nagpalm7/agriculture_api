@@ -32,6 +32,21 @@ class AddLocationSerializer(serializers.ModelSerializer):
         model = Location
         fields = '__all__'
 
+class AddAdoReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdoReport
+        fields = '__all__'
+
+class ImageSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Image
+        fields = ('image',)
+
+class AddImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Image
+        fields = '__all__'
+
 # CustomerInformation Serializer
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -64,3 +79,14 @@ class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = '__all__'                        
+
+class AdoReportSerializer(serializers.ModelSerializer):
+    images = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AdoReport
+        fields = '__all__'
+
+    def get_images(self, obj):
+        images = Image.objects.filter(report = obj)
+        return ImageSerializer(images, many=True, context={'request':self.context.get('request')}).data
