@@ -132,7 +132,7 @@ class LocationDetail(APIView):
 
     def patch(self, request, pk, format = None):
         location = self.get_object(pk)
-        serializer = LocationSerializer(location, data=request.data, partial=True)
+        serializer = AddLocationSerializer(location, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -301,6 +301,7 @@ class LocationList(APIView):
                     serializer.save()
                     count = count + 1;
             return Response({'status': 'success', 'count': count}, status=status.HTTP_201_CREATED)
+        print("error", request.data.location_csv)
         return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
 # Shows list of locations for specific ado for admin
