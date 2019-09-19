@@ -80,6 +80,8 @@ class UserAdmin(BaseUserAdmin):
     filter_horizontal = ()
 
 admin.site.register(User, UserAdmin)
+admin.site.register(District)
+admin.site.register(Village)
 admin.site.register(Location)
 admin.site.register(Admin)
 admin.site.register(Ado)

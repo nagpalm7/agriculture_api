@@ -53,6 +53,16 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['pk', 'username', 'type_of_user',]   
 
+class DistrictSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = District
+        fields = '__all__'
+
+class VillageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Village
+        fields = '__all__'
+
 class AdminSerializer(serializers.ModelSerializer):
     auth_user = UserSerializer()
     class Meta:

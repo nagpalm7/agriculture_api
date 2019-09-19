@@ -72,7 +72,87 @@ class UserDetail(APIView):
     def delete(self, request, pk, format = None):
         user = self.get_object(pk)
         user.delete()
-        return Response(status=HTTP_204_NO_CONTENT)            
+        return Response(status=status.HTTP_204_NO_CONTENT)            
+
+# VIEWS FOR DISTRICT
+class DistrictList(APIView):
+    def get(self, request, format = None):
+        districts = District.objects.all()
+        serializer = DistrictSerializer(districts, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format = None):
+        serializer = DistrictSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class DistrictDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return District.objects.get(pk=pk)
+        except District.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format = None):
+        district = self.get_object(pk)
+        data = District.objects.get(pk=pk)
+        serializer = DistrictSerializer(data)         
+        return Response(serializer.data)
+
+    def put(self, request, pk, format = None):
+        district = self.get_object(pk)
+        serializer = DistrictSerializer(district, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format = None):
+        district = self.get_object(pk)
+        district.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+# VIEWS FOR Village
+class VillageList(APIView):
+    def get(self, request, format = None):
+        villages = Village.objects.all()
+        serializer = VillageSerializer(villages, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format = None):
+        serializer = VillageSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class VillageDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return Village.objects.get(pk=pk)
+        except Village.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format = None):
+        village = self.get_object(pk)
+        data = Village.objects.get(pk=pk)
+        serializer = VillageSerializer(data)         
+        return Response(serializer.data)
+
+    def put(self, request, pk, format = None):
+        village = self.get_object(pk)
+        serializer = VillageSerializer(village, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format = None):
+        village = self.get_object(pk)
+        village.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 # Shows list of Admins
 class AdminViewSet(viewsets.ReadOnlyModelViewSet):
@@ -141,7 +221,7 @@ class LocationDetail(APIView):
     def delete(self, request, pk, format = None):
         location = self.get_object(pk)
         location.delete()
-        return Response(status=HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class GetUser(APIView):
     permission_classes = [IsAuthenticated,]
@@ -409,4 +489,4 @@ class AdoReportDetail(APIView):
     def delete(self, request, pk, format = None):
         report = self.get_object(pk)
         report.delete()
-        return Response(status=HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)

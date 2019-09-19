@@ -68,6 +68,20 @@ class Admin(models.Model):
     def __str__(self):
         return str(self.name)
 
+class District(models.Model):
+    district = models.CharField(max_length = 500, blank = True, null = True, unique = False)
+    district_code = models.CharField(max_length=200, blank=False, null=False)
+
+    def __str__(self):
+        return self.district
+
+class Village(models.Model):
+    village = models.CharField(max_length = 500, blank = True, null = True, unique = False)
+    village_code = models.CharField(max_length=200, blank=False, null=False)
+
+    def __str__(self):
+        return self.village
+
 class Dda(models.Model):
     name = models.CharField(max_length=200, blank=False, null=True)
     district = models.CharField(max_length=200, blank=False, null=False)
