@@ -63,7 +63,18 @@ class UserDetail(APIView):
 
     def put(self, request, pk, format = None):
         user = self.get_object(pk)
-        serializer = UserSerializer(user, data=request.data)
+        type_of_user = user.type_of_user
+        data = []
+        serializer = []
+        if type_of_user == 'admin':
+            data = Admin.objects.get(auth_user=pk)
+            serializer = AddAdminSerializer(data, request.data, partial=True)
+        elif type_of_user == 'dda':
+            data = Dda.objects.get(auth_user=pk)
+            serializer = AddDdaSerializer(data, request.data, partial=True)
+        elif type_of_user == 'ado':
+            data = Ado.objects.get(auth_user=pk)
+            serializer = AddAdoSerializer(data, request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -71,7 +82,14 @@ class UserDetail(APIView):
 
     def delete(self, request, pk, format = None):
         user = self.get_object(pk)
-        user.delete()
+        type_of_user = user.type_of_user
+        if type_of_user == 'admin':
+            data = Admin.objects.get(auth_user=pk)
+        elif type_of_user == 'dda':
+            data = Dda.objects.get(auth_user=pk)
+        elif type_of_user == 'ado':
+            data = Ado.objects.get(auth_user=pk)
+        data.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)            
 
 # VIEWS FOR DISTRICT
@@ -115,12 +133,21 @@ class DistrictDetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 # VIEWS FOR Village
-class VillageList(APIView):
-    def get(self, request, format = None):
-        villages = Village.objects.all()
-        serializer = VillageSerializer(villages, many=True)
-        return Response(serializer.data)
+# Shows list of ado for specific dda logged in
+class VillageViewSet(viewsets.ReadOnlyModelViewSet):
+    model = Village
+    serializer_class = VillageSerializer
+    permission_classes = (IsAuthenticated, )
+    pagination_class = StandardResultsSetPagination
+    # Making endpoint searchable
+    # filter_backends = (filters.SearchFilter, )
+    # search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
 
+    def get_queryset(self):
+        villages = Village.objects.all()
+        return villages
+
+class VillageList(APIView):
     def post(self, request, format = None):
         serializer = VillageSerializer(data=request.data)
         if serializer.is_valid():

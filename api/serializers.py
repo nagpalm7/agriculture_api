@@ -71,12 +71,14 @@ class AdminSerializer(serializers.ModelSerializer):
 
 class DdaSerializer(serializers.ModelSerializer):
     auth_user = UserSerializer()
+    district = DistrictSerializer()
     class Meta:
         model = Dda
         fields = '__all__'
 
 class AdoSerializer(serializers.ModelSerializer):
     auth_user = UserSerializer()
+    village = VillageSerializer()
     dda = DdaSerializer()
     class Meta:
         model = Ado

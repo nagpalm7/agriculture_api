@@ -11,8 +11,9 @@ urlpatterns = [
     path('api/district/', views.DistrictList.as_view(), name='district-list'),
     path('api/district/<int:pk>/', views.DistrictDetail.as_view(), name='district-detail'),
     # Url for districts
-    path('api/village/', views.VillageList.as_view(), name='village-list'),
+    path('api/village/', views.VillageList.as_view(), name='village-view'),
     path('api/village/<int:pk>/', views.VillageDetail.as_view(), name='village-detail'),
+    path('api/villages-list/', views.VillageViewSet.as_view({'get': 'list'}), name='village-list'),
     # Url for admin, ado and dda list paginated
     path('api/users-list/admin/', views.AdminViewSet.as_view({'get': 'list'}), name='admin-list'),
     path('api/users-list/dda/', views.DdaViewSet.as_view({'get': 'list'}), name='dda-list'),

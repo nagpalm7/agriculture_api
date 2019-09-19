@@ -10,6 +10,7 @@ from django.core.validators import (
 from django.db.models import Q
 
 userTypes = ( ('admin','admin'),('dda','dda'), ('ado', 'ado') )
+actions = ( ('challan','Challan'),('fir','FIR') )
 choices_status = ( ('pending','pending'),('ongoing','ongoing'),('completed','completed') )
 
 # --------------------- MODELS ----------------------
@@ -72,6 +73,11 @@ class District(models.Model):
     district = models.CharField(max_length = 500, blank = True, null = True, unique = False)
     district_code = models.CharField(max_length=200, blank=False, null=False)
 
+    def save(self, *args, **kwargs):
+        if self.district:
+            self.district = self.district.upper()
+        return super(District, self).save(*args, **kwargs)
+
     def __str__(self):
         return self.district
 
@@ -79,41 +85,40 @@ class Village(models.Model):
     village = models.CharField(max_length = 500, blank = True, null = True, unique = False)
     village_code = models.CharField(max_length=200, blank=False, null=False)
 
+    def save(self, *args, **kwargs):
+        if self.village:
+            self.village = self.village.upper()
+        return super(Village, self).save(*args, **kwargs)
+
     def __str__(self):
         return self.village
 
 class Dda(models.Model):
     name = models.CharField(max_length=200, blank=False, null=True)
-    district = models.CharField(max_length=200, blank=False, null=False)
+    district = models.ForeignKey(District, on_delete = models.CASCADE, blank = False, null = False, related_name='dda_district')
+    number = models.CharField(max_length=15, blank=False, null=True)
+    email = models.CharField(max_length=100, blank=False, null=True)
     auth_user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
     )
 
-    def save(self, *args, **kwargs):
-        if self.district:
-            self.district = self.district.lower()
-        return super(Dda, self).save(*args, **kwargs)
-
     def __str__(self):
-        return str(self.name + ' (' + self.district + ')')
+        return str(self.name + ' (' + self.district.district + ')')
 
 class Ado(models.Model):
     name = models.CharField(max_length=200, blank=False, null=True)
-    village_name = models.CharField(max_length=200, blank=False, null=False)
+    number = models.CharField(max_length=15, blank=False, null=True)
+    email = models.CharField(max_length=100, blank=False, null=True)
+    village = models.ForeignKey(Village, on_delete = models.CASCADE, blank = False, null = False, related_name='ado_village')
     dda = models.ForeignKey(Dda, on_delete = models.CASCADE, blank = True, null = True, related_name='ado_dda')
     auth_user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
     )
 
-    def save(self, *args, **kwargs):
-        if self.village_name:
-            self.village_name = self.village_name.lower()
-        return super(Ado, self).save(*args, **kwargs)
-
     def __str__(self):
-        return str(self.name + ' (' + self.village_name + ')')
+        return str(self.name + ' (' + self.village.village + ')')
 
 class Location(models.Model):
     state = models.CharField(max_length = 50, blank = False, null = False, unique = False)
@@ -136,16 +141,16 @@ class Location(models.Model):
         return self.district + ' ' + self.state
  
 class AdoReport(models.Model):
-    name = models.CharField(max_length = 50, blank = True, null = True, unique = False)
-    district = models.CharField(max_length = 50, blank = True, null = True, unique = False)
-    block_name = models.CharField(max_length = 50, blank = True, null = True, unique = False)
-    village_name = models.CharField(max_length = 100, blank = True, null = True, unique = False)
+    village_code = models.CharField(max_length = 50, blank = True, null = True, unique = False)
+    farmer_code = models.CharField(max_length = 50, blank = True, null = True, unique = False)
     longitude = models.CharField(max_length = 100, blank = True, null = True, unique = False)
     latitude = models.CharField(max_length = 100, blank = True, null = True, unique = False)
     kila_num = models.CharField(max_length = 50, blank = True, null = True, unique = False)
     murrabba_num = models.CharField(max_length = 50, blank = True, null = True, unique = False)
     incident_reason = models.CharField(max_length = 500, blank = True, null = True, unique = False)        
     remarks = models.CharField(max_length = 500, blank = True, null = True, unique = False)
+    ownership = models.CharField(max_length = 50, blank = True, null = True, unique = False)
+    action = models.CharField(max_length = 50, choices = actions, blank = True, null = True, unique = False)
     location = models.ForeignKey(Location, on_delete = models.CASCADE)
 
     def __str__(self):
