@@ -390,14 +390,14 @@ class LocationList(APIView):
                 request.data['acq_time'] = data[7].split('.')[0]
                 # request.data['csv_file'] = MEDIA_ROOT + 'locationCSVs/' + request.data['location_csv'].name
                 try:
-                    dda = Dda.objects.get(district=data[1].lower())
+                    dda = Dda.objects.get(district__district=data[1].upper())
                     request.data['dda'] = dda.pk
                 except Dda.DoesNotExist:
                     if 'dda' in request.data:
                         del request.data['dda']
 
                 try:
-                    ado = Ado.objects.get(village_name=data[3].lower())
+                    ado = Ado.objects.get(village__village=data[3].upper())
                     request.data['ado'] = ado.pk
                 except Ado.DoesNotExist:
                     if 'ado' in request.data:
