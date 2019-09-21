@@ -94,6 +94,7 @@ class LocationSerializer(serializers.ModelSerializer):
 
 class AdoReportSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
+    location = LocationSerializer()
 
     class Meta:
         model = AdoReport

@@ -501,7 +501,10 @@ class AdoReportDetail(APIView):
             raise Http404
 
     def get(self, request, pk, format = None):
-        report = self.get_object(pk)
+        try:
+            report = AdoReport.objects.get(location=pk)
+        except AdoReport.DoesNotExist:
+            raise Http404
         serializer = AdoReportSerializer(report, context={'request': request})        
         return Response(serializer.data)
 
