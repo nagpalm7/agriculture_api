@@ -16,7 +16,7 @@ from django.db.models import Q
 class UserList(APIView):
     pagination_class = StandardResultsSetPagination
     def get(self, request, format = None):
-        users = User.objects.all()
+        users = User.objects.all().order_by('-pk')
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
 
@@ -95,7 +95,7 @@ class UserDetail(APIView):
 # VIEWS FOR DISTRICT
 class DistrictList(APIView):
     def get(self, request, format = None):
-        districts = District.objects.all()
+        districts = District.objects.all().order_by('-pk')
         serializer = DistrictSerializer(districts, many=True)
         return Response(serializer.data)
 
@@ -144,7 +144,7 @@ class VillageViewSet(viewsets.ReadOnlyModelViewSet):
     # search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
 
     def get_queryset(self):
-        villages = Village.objects.all()
+        villages = Village.objects.all().order_by('-pk')
         return villages
 
 class VillageList(APIView):
@@ -192,7 +192,7 @@ class AdminViewSet(viewsets.ReadOnlyModelViewSet):
     # search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
 
     def get_queryset(self):
-        admins = Admin.objects.all()
+        admins = Admin.objects.all().order_by('-pk')
         return admins
 
 # Shows list of Ddas
@@ -206,7 +206,7 @@ class DdaViewSet(viewsets.ReadOnlyModelViewSet):
     # search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
 
     def get_queryset(self):
-        ddas = Dda.objects.all()
+        ddas = Dda.objects.all().order_by('-pk')
         return ddas
 
 # Shows list of Ados
@@ -220,7 +220,7 @@ class AdosViewSet(viewsets.ReadOnlyModelViewSet):
     # search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
 
     def get_queryset(self):
-        ados = Ado.objects.all()
+        ados = Ado.objects.all().order_by('-pk')
         return ados
 
 # Details of particular location and edit location in order to set ado
@@ -280,11 +280,11 @@ class LocationViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         stat = self.kwargs['status']
         if stat == 'unassigned':
-            locations = Location.objects.filter(status='pending', ado=None)
+            locations = Location.objects.filter(status='pending', ado=None).order_by('-pk')
         elif stat == 'assigned':
-            locations = Location.objects.filter(status='pending').exclude(ado=None)
+            locations = Location.objects.filter(status='pending').exclude(ado=None).order_by('-pk')
         else:
-            locations = Location.objects.filter(status=stat)
+            locations = Location.objects.filter(status=stat).order_by('-pk')
         return locations
 
 # Shows list of locations for specific ado logged in
@@ -305,9 +305,9 @@ class LocationViewSetAdo(viewsets.ReadOnlyModelViewSet):
         stat = self.kwargs['status']
         locations = []
         if stat == 'pending':
-            locations = Location.objects.filter(status=stat, ado=user)
+            locations = Location.objects.filter(status=stat, ado=user).order_by('-pk')
         elif stat == 'completed':
-            locations = Location.objects.filter(status__in=['completed', 'ongoing'], ado=user)
+            locations = Location.objects.filter(status__in=['completed', 'ongoing'], ado=user).order_by('-pk')
         return locations
 
 # Shows list of locations for specific dda
@@ -328,13 +328,13 @@ class LocationViewSetDda(viewsets.ReadOnlyModelViewSet):
         stat = self.kwargs['status']
         locations = []
         if stat == 'unassigned':
-            locations = Location.objects.filter(status='pending', dda=user ,ado=None)
+            locations = Location.objects.filter(status='pending', dda=user ,ado=None).order_by('-pk')
         elif stat == 'assigned':
-            locations = Location.objects.filter(status='pending', dda=user).exclude(ado=None)
+            locations = Location.objects.filter(status='pending', dda=user).exclude(ado=None).order_by('-pk')
         elif stat == 'ongoing':
-            locations = Location.objects.filter(status=stat, dda=user)
+            locations = Location.objects.filter(status=stat, dda=user).order_by('-pk')
         elif stat == 'completed':
-            locations = Location.objects.filter(status=stat, dda=user)
+            locations = Location.objects.filter(status=stat, dda=user).order_by('-pk')
         return locations
 
 # Shows list of ado for specific dda logged in
@@ -352,7 +352,7 @@ class AdoViewSet(viewsets.ReadOnlyModelViewSet):
             dda = Dda.objects.get(auth_user=self.request.user.pk)
         except Dda.DoesNotExist:
             raise Http404
-        ados = Ado.objects.filter(dda = dda)
+        ados = Ado.objects.filter(dda = dda).order_by('-pk')
         return ados
 
 # Upload CSV
@@ -429,9 +429,9 @@ class LocationViewSetAdoForAdmin(viewsets.ReadOnlyModelViewSet):
         stat = self.kwargs['status']
         locations = []
         if stat == 'pending':
-            locations = Location.objects.filter(status=stat, ado=user)
+            locations = Location.objects.filter(status=stat, ado=user).order_by('-pk')
         elif stat == 'completed':
-            locations = Location.objects.filter(status__in=['completed', 'ongoing'], ado=user)
+            locations = Location.objects.filter(status__in=['completed', 'ongoing'], ado=user).order_by('-pk')
         return locations
 
 # Shows list of locations for specific dda for admin
@@ -452,13 +452,13 @@ class LocationViewSetDdaForAdmin(viewsets.ReadOnlyModelViewSet):
         stat = self.kwargs['status']
         locations = []
         if stat == 'unassigned':
-            locations = Location.objects.filter(status='pending', dda=user ,ado=None)
+            locations = Location.objects.filter(status='pending', dda=user ,ado=None).order_by('-pk')
         elif stat == 'assigned':
-            locations = Location.objects.filter(status='pending', dda=user).exclude(ado=None)
+            locations = Location.objects.filter(status='pending', dda=user).exclude(ado=None).order_by('-pk')
         elif stat == 'ongoing':
-            locations = Location.objects.filter(status=stat, dda=user)
+            locations = Location.objects.filter(status=stat, dda=user).order_by('-pk')
         elif stat == 'completed':
-            locations = Location.objects.filter(status=stat, dda=user)
+            locations = Location.objects.filter(status=stat, dda=user).order_by('-pk')
         return locations
 
 
@@ -466,7 +466,7 @@ class LocationViewSetDdaForAdmin(viewsets.ReadOnlyModelViewSet):
 class ImageView(APIView):
 
     def get(self, request, format = None):
-        images = Image.objects.all()
+        images = Image.objects.all().order_by('-pk')
         serializer = ImageSerializer(images, many=True)
         return Response(serializer.data)
 
