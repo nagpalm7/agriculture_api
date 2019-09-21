@@ -141,20 +141,22 @@ class Location(models.Model):
         return self.district + ' ' + self.state
  
 class AdoReport(models.Model):
-    village_code = models.CharField(max_length = 50, blank = True, null = True, unique = False)
-    farmer_code = models.CharField(max_length = 50, blank = True, null = True, unique = False)
+    village_code = models.CharField(max_length = 50, blank = False, null = False, unique = False)
+    farmer_code = models.CharField(max_length = 50, blank = False, null = False, unique = False)
+    farmer_name = models.CharField(max_length = 50, blank = False, null = False, unique = False)
+    father_name = models.CharField(max_length = 50, blank = False, null = False, unique = False)
     longitude = models.CharField(max_length = 100, blank = True, null = True, unique = False)
     latitude = models.CharField(max_length = 100, blank = True, null = True, unique = False)
-    kila_num = models.CharField(max_length = 50, blank = True, null = True, unique = False)
-    murrabba_num = models.CharField(max_length = 50, blank = True, null = True, unique = False)
+    kila_num = models.CharField(max_length = 50, blank = False, null = False, unique = False)
+    murrabba_num = models.CharField(max_length = 50, blank = False, null = False, unique = False)
     incident_reason = models.CharField(max_length = 500, blank = True, null = True, unique = False)        
     remarks = models.CharField(max_length = 500, blank = True, null = True, unique = False)
     ownership = models.CharField(max_length = 50, blank = True, null = True, unique = False)
-    action = models.CharField(max_length = 50, choices = actions, blank = True, null = True, unique = False)
+    action = models.CharField(max_length = 50, choices = actions, blank = False, null = False, unique = False)
     location = models.ForeignKey(Location, on_delete = models.CASCADE)
 
     def __str__(self):
-        return self.location
+        return self.location.village_name
 
 class Image(models.Model):
     report = models.ForeignKey(AdoReport, on_delete = models.CASCADE)
