@@ -170,7 +170,7 @@ class VillageDetail(APIView):
 
     def put(self, request, pk, format = None):
         village = self.get_object(pk)
-        serializer = VillageSerializer(village, data=request.data, , partial=True)
+        serializer = VillageSerializer(village, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -510,7 +510,7 @@ class AdoReportDetail(APIView):
 
     def put(self, request, pk, format = None):
         report = self.get_object(pk)
-        serializer = AddAdoReportSerializer(report, data=request.data, , partial=True)
+        serializer = AddAdoReportSerializer(report, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
