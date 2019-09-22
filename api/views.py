@@ -23,8 +23,6 @@ class UserList(APIView):
     def post(self, request, format = None):
         username = request.data.get('username')
         password = request.data.get('password') 
-        request.data.pop('username')
-        request.data.pop('password')
         try:
             django_user_obj = DjangoUser.objects.create(username=username)
         except IntegrityError as e:
@@ -33,7 +31,9 @@ class UserList(APIView):
         django_user_obj.save()
         request.data['auth_user'] = django_user_obj
         type_of_user = request.data.type_of_user
-        request.data.pop('type_of_user')
+        del request.data.['type_of_user']
+        del request.data.['username']
+        del request.data.['password']
         serializer = []
         if type_of_user == 'admin':
             serializer = AddAdminSerializer(data=request.data)
