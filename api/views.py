@@ -31,9 +31,9 @@ class UserList(APIView):
         django_user_obj.save()
         request.data['auth_user'] = django_user_obj
         type_of_user = request.data.type_of_user
-        del request.data.['type_of_user']
-        del request.data.['username']
-        del request.data.['password']
+        del request.data['type_of_user']
+        del request.data['username']
+        del request.data['password']
         serializer = []
         if type_of_user == 'admin':
             serializer = AddAdminSerializer(data=request.data)
