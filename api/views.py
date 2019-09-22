@@ -32,10 +32,18 @@ class UserList(APIView):
         django_user_obj.set_password(password)
         django_user_obj.save()
         request.data['auth_user'] = django_user_obj
-        serializer = UserSerializer(data=request.data)
+        type_of_user = request.data.type_of_user
+        request.data.pop('type_of_user')
+        serializer = []
+        if type_of_user == 'admin':
+            serializer = AddAdminSerializer(data=request.data)
+        elif type_of_user == 'dda':
+            serializer = AddDdaSerializer(data=request.data)
+        elif type_of_user == 'ado':
+            serializer = AddAdoSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserDetail(APIView):
