@@ -23,8 +23,9 @@ class UserList(APIView):
     def post(self, request, format = None):
         username = request.data.get('username')
         password = request.data.get('password') 
+        type_of_user = request.data.get('type_of_user')
         try:
-            django_user_obj = DjangoUser.objects.create(username=username)
+            django_user_obj = User.objects.create(username=username, type_of_user=type_of_user)
         except IntegrityError as e:
             raise ValidationError(str(e))
         django_user_obj.set_password(password)
