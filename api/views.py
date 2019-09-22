@@ -14,33 +14,35 @@ import os
 from django.db.models import Q
 
 class UserList(APIView):
+    permission_classes = []
     def get(self, request, format = None):
         users = User.objects.all().order_by('-pk')
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
 
     def post(self, request, format = None):
-        username = request.data.get('username')
-        password = request.data.get('password') 
-        type_of_user = request.data.get('type_of_user')
+        request.data._mutable = True
+        data = request.data
+        username = data.get('username')
+        password = data.get('password') 
+        type_of_user = data.get('type_of_user')
         try:
             django_user_obj = User.objects.create(username=username, type_of_user=type_of_user)
         except IntegrityError as e:
             raise ValidationError(str(e))
         django_user_obj.set_password(password)
         django_user_obj.save()
-        request.data['auth_user'] = django_user_obj
-        type_of_user = request.data.type_of_user
-        # del request.data['type_of_user']
-        # del request.data['username']
-        # del request.data['password']
+        data['auth_user'] = django_user_obj.pk
+        del data['type_of_user']
+        del data['username']
+        del data['password']
         serializer = []
         if type_of_user == 'admin':
-            serializer = AddAdminSerializer(data=request.data)
+            serializer = AddAdminSerializer(data=data)
         elif type_of_user == 'dda':
-            serializer = AddDdaSerializer(data=request.data)
+            serializer = AddDdaSerializer(data=data)
         elif type_of_user == 'ado':
-            serializer = AddAdoSerializer(data=request.data)
+            serializer = AddAdoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
