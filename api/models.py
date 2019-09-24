@@ -10,7 +10,7 @@ from django.core.validators import (
 from django.db.models import Q
 
 userTypes = ( ('admin','admin'),('dda','dda'), ('ado', 'ado') )
-actions = ( ('challan','Challan'),('fir','FIR') )
+actions = ( ('chalaan','Challan'),('FIR','FIR') )
 choices_status = ( ('pending','pending'),('ongoing','ongoing'),('completed','completed') )
 
 # --------------------- MODELS ----------------------
