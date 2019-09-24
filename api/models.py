@@ -151,6 +151,7 @@ class AdoReport(models.Model):
     murrabba_num = models.CharField(max_length = 50, blank = False, null = False, unique = False)
     incident_reason = models.CharField(max_length = 500, blank = True, null = True, unique = False)        
     remarks = models.CharField(max_length = 500, blank = True, null = True, unique = False)
+    amount = models.CharField(max_length = 500, blank = True, null = True, unique = False)
     ownership = models.CharField(max_length = 50, blank = True, null = True, unique = False)
     action = models.CharField(max_length = 50, choices = actions, blank = False, null = False, unique = False)
     location = models.ForeignKey(Location, on_delete = models.CASCADE)

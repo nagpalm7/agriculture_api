@@ -101,5 +101,5 @@ class AdoReportSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_images(self, obj):
-        images = Image.objects.filter(report = obj)
+        images = Image.objects.filter(report = obj).order_by('-pk')
         return ImageSerializer(images, many=True, context={'request':self.context.get('request')}).data

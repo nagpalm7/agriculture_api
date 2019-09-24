@@ -290,11 +290,11 @@ class LocationViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         stat = self.kwargs['status']
         if stat == 'unassigned':
-            locations = Location.objects.filter(status='pending', ado=None).order_by('-pk')
+            locations = Location.objects.filter(status='pending', ado=None).order_by('district', 'block_name', 'village_name')
         elif stat == 'assigned':
-            locations = Location.objects.filter(status='pending').exclude(ado=None).order_by('-pk')
+            locations = Location.objects.filter(status='pending').exclude(ado=None).order_by('district', 'block_name', 'village_name')
         else:
-            locations = Location.objects.filter(status=stat).order_by('-pk')
+            locations = Location.objects.filter(status=stat).order_by('district', 'block_name', 'village_name')
         return locations
 
 # Shows list of locations for specific ado logged in
@@ -315,9 +315,9 @@ class LocationViewSetAdo(viewsets.ReadOnlyModelViewSet):
         stat = self.kwargs['status']
         locations = []
         if stat == 'pending':
-            locations = Location.objects.filter(status=stat, ado=user).order_by('-pk')
+            locations = Location.objects.filter(status=stat, ado=user).order_by('district', 'block_name', 'village_name')
         elif stat == 'completed':
-            locations = Location.objects.filter(status__in=['completed', 'ongoing'], ado=user).order_by('-pk')
+            locations = Location.objects.filter(status__in=['completed', 'ongoing'], ado=user).order_by('district', 'block_name', 'village_name')
         return locations
 
 # Shows list of locations for specific dda
@@ -338,13 +338,13 @@ class LocationViewSetDda(viewsets.ReadOnlyModelViewSet):
         stat = self.kwargs['status']
         locations = []
         if stat == 'unassigned':
-            locations = Location.objects.filter(status='pending', dda=user ,ado=None).order_by('-pk')
+            locations = Location.objects.filter(status='pending', dda=user ,ado=None).order_by('district', 'block_name', 'village_name')
         elif stat == 'assigned':
-            locations = Location.objects.filter(status='pending', dda=user).exclude(ado=None).order_by('-pk')
+            locations = Location.objects.filter(status='pending', dda=user).exclude(ado=None).order_by('district', 'block_name', 'village_name')
         elif stat == 'ongoing':
-            locations = Location.objects.filter(status=stat, dda=user).order_by('-pk')
+            locations = Location.objects.filter(status=stat, dda=user).order_by('district', 'block_name', 'village_name')
         elif stat == 'completed':
-            locations = Location.objects.filter(status=stat, dda=user).order_by('-pk')
+            locations = Location.objects.filter(status=stat, dda=user).order_by('district', 'block_name', 'village_name')
         return locations
 
 # Shows list of ado for specific dda logged in
@@ -439,9 +439,9 @@ class LocationViewSetAdoForAdmin(viewsets.ReadOnlyModelViewSet):
         stat = self.kwargs['status']
         locations = []
         if stat == 'pending':
-            locations = Location.objects.filter(status=stat, ado=user).order_by('-pk')
+            locations = Location.objects.filter(status=stat, ado=user).order_by('district', 'block_name', 'village_name')
         elif stat == 'completed':
-            locations = Location.objects.filter(status__in=['completed', 'ongoing'], ado=user).order_by('-pk')
+            locations = Location.objects.filter(status__in=['completed', 'ongoing'], ado=user).order_by('district', 'block_name', 'village_name')
         return locations
 
 # Shows list of locations for specific dda for admin
@@ -462,13 +462,13 @@ class LocationViewSetDdaForAdmin(viewsets.ReadOnlyModelViewSet):
         stat = self.kwargs['status']
         locations = []
         if stat == 'unassigned':
-            locations = Location.objects.filter(status='pending', dda=user ,ado=None).order_by('-pk')
+            locations = Location.objects.filter(status='pending', dda=user ,ado=None).order_by('district', 'block_name', 'village_name')
         elif stat == 'assigned':
-            locations = Location.objects.filter(status='pending', dda=user).exclude(ado=None).order_by('-pk')
+            locations = Location.objects.filter(status='pending', dda=user).exclude(ado=None).order_by('district', 'block_name', 'village_name')
         elif stat == 'ongoing':
-            locations = Location.objects.filter(status=stat, dda=user).order_by('-pk')
+            locations = Location.objects.filter(status=stat, dda=user).order_by('district', 'block_name', 'village_name')
         elif stat == 'completed':
-            locations = Location.objects.filter(status=stat, dda=user).order_by('-pk')
+            locations = Location.objects.filter(status=stat, dda=user).order_by('district', 'block_name', 'village_name')
         return locations
 
 
