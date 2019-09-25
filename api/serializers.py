@@ -78,7 +78,7 @@ class DdaSerializer(serializers.ModelSerializer):
 
 class AdoSerializer(serializers.ModelSerializer):
     auth_user = UserSerializer()
-    village = VillageSerializer()
+    village = VillageSerializer(many=True)
     dda = DdaSerializer()
     class Meta:
         model = Ado

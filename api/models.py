@@ -110,7 +110,7 @@ class Ado(models.Model):
     name = models.CharField(max_length=200, blank=False, null=True)
     number = models.CharField(max_length=15, blank=False, null=True)
     email = models.CharField(max_length=100, blank=False, null=True)
-    village = models.ForeignKey(Village, on_delete = models.CASCADE, blank = False, null = False, related_name='ado_village')
+    village = models.ManyToManyField(Village, related_name='ado_village')
     dda = models.ForeignKey(Dda, on_delete = models.CASCADE, blank = True, null = True, related_name='ado_dda')
     auth_user = models.OneToOneField(
         User,
@@ -118,7 +118,7 @@ class Ado(models.Model):
     )
 
     def __str__(self):
-        return str(self.name + ' (' + self.village.village + ')')
+        return str(self.name)
 
 class Location(models.Model):
     state = models.CharField(max_length = 50, blank = False, null = False, unique = False)
