@@ -103,6 +103,7 @@ class UserDetail(APIView):
 
 # VIEWS FOR DISTRICT
 class DistrictList(APIView):
+    permission_classes = ['']
     def get(self, request, format = None):
         districts = District.objects.all().order_by('-pk')
         serializer = DistrictSerializer(districts, many=True)
