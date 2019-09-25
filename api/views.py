@@ -21,7 +21,7 @@ class UserList(APIView):
         return Response(serializer.data)
 
     def post(self, request, format = None):
-        data = request.data
+        data = request.data.copy()
         username = data.get('username')
         password = data.get('password') 
         type_of_user = data.get('type_of_user')
