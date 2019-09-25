@@ -26,6 +26,7 @@ urlpatterns = [
     path('api/locations/dda/<str:status>', views.LocationViewSetDda.as_view({'get': 'list'}), name='dda-location-list'),
     path('api/admin/ado/<int:pk>/<str:status>', views.LocationViewSetAdoForAdmin.as_view({'get': 'list'}), name='admin-ado-location-list'),
     path('api/admin/dda/<int:pk>/<str:status>', views.LocationViewSetDdaForAdmin.as_view({'get': 'list'}), name='admin-dda-location-list'),
+    path('api/location/district/<int:pk>/<str:status>', views.LocationDistrictWiseViewSet.as_view({'get': 'list'}), name='location-district-location-list'),
     # List of ados under a specific dda logged in
     path('api/ado/', views.AdoViewSet.as_view({'get': 'list'}), name='ado-list'),
     # Ado report and image views
