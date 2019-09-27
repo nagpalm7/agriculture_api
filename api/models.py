@@ -123,8 +123,8 @@ class Ado(models.Model):
 class Location(models.Model):
     state = models.CharField(max_length = 50, blank = False, null = False, unique = False)
     district = models.CharField(max_length = 50, blank = False, null = False, unique = False)
-    block_name = models.CharField(max_length = 50, blank = False, null = False, unique = False)
-    village_name = models.CharField(max_length = 100, blank = False, null = False, unique = False)
+    block_name = models.CharField(max_length = 50, blank = True, null = True, unique = False)
+    village_name = models.CharField(max_length = 100, blank = True, null = True, unique = False)
     longitude = models.CharField(max_length = 100, blank = False, null = False, unique = False)
     latitude = models.CharField(max_length = 100, blank = False, null = False, unique = False)
     acq_date = models.DateField(default = timezone.now)
@@ -148,7 +148,8 @@ class Location(models.Model):
         return self.district + ' ' + self.state
  
 class AdoReport(models.Model):
-    village_code = models.CharField(max_length = 50, blank = False, null = False, unique = False)
+    village_code = models.CharField(max_length = 50, blank = True, null = True, unique = False)
+    village = models.ForeignKey(Village, on_delete = models.CASCADE, blank = True, null = True, default = None, related_name = 'location_village')
     farmer_code = models.CharField(max_length = 50, blank = False, null = False, unique = False)
     farmer_name = models.CharField(max_length = 50, blank = False, null = False, unique = False)
     father_name = models.CharField(max_length = 50, blank = False, null = False, unique = False)
