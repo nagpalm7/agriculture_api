@@ -608,6 +608,7 @@ class BulkAddVillage(APIView):
             villages = []
             count = 0
             if 'village_csv' in request.data:
+                print(request.data['village_csv'])
                 if not request.data['village_csv'].name.endswith('.csv'):
                     return Response({'village_csv': ['Please upload a valid document ending with .csv']},
                         status = HTTP_400_BAD_REQUEST)
