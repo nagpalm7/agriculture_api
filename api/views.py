@@ -655,16 +655,12 @@ class BulkAddAdo(APIView):
                 # Create a unique filename
                 filename = str(uuid.uuid4()) + '.csv'
                 csvFile = open(directory + filename, 'w')
-                csvFile.write('Username,Password\n')
+                csvFile.write('Name,Username,Password\n')
                 for data in ados:
                     data = data.split(',')
                     request.data['name']  = data[0]
                     request.data['number'] = data[1]
                     request.data['email'] = data[2]
-                    try:
-                        request.data['village'] = Village.objects.get(village=data[3].upper())
-                    except Village.DoesNotExist:
-                        pass
 
                     try:
                         request.data['dda'] = Dda.objects.get(district__district=data[4].upper())
@@ -689,44 +685,26 @@ class BulkAddAdo(APIView):
                     serializer = AddAdoSerializer(data=request.data)
                     if serializer.is_valid():
                         serializer.save()
-                        csvFile.write(username + ',' + password + '\n')
+                        try:
+                            ado = Ado.objects.get(id = serializer.data['id'])
+                        except Ado.DoesNotExist:
+                            ado = None
+                        if ado:
+                            arr = []
+                            villages = data[3].split('|')
+                            for village in villages:
+                                try:
+                                    village = Village.objects.get(village=village.upper().strip())
+                                    arr.append(int(village.id))
+                                except Village.DoesNotExist:
+                                    pass
+                            ado.village.set(arr)
+                            ado.save()
+                        csvFile.write(data[0] + ',' + username + ',' + password + '\n')
                         count = count + 1;
                     else:
                         print(serializer.errors)
                 csvFile.close()
                 absolute_path = DOMAIN + 'media/adoCSVs/'+ filename
                 return Response({'status': 'success', 'count': count, 'csvFile':absolute_path}, status=status.HTTP_201_CREATED)
-            return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
-
-# BULK ADD VILLAGE
-class BulkAddVillage(APIView):
-
-    def post(self, request, format = None):
-            directory = MEDIA_ROOT + '/villageCSV/'
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-
-            villages = []
-            count = 0
-            if 'village_csv' in request.data:
-                if not request.data['village_csv'].name.endswith('.csv'):
-                    return Response({'village_csv': ['Please upload a valid document ending with .csv']},
-                        status = HTTP_400_BAD_REQUEST)
-                fs = FileSystemStorage()
-                fs.save(directory + request.data['village_csv'].name, request.data['village_csv'])
-                csvFile = open(directory + request.data['village_csv'].name, 'r')
-                for line in csvFile.readlines():
-                    villages.append(line)
-                
-                villages.pop(0);
-
-                for data in villages:
-                    data = data.split(',')
-                    request.data['village']  = data[0]
-                    request.data['village_code'] = data[1]
-                    serializer = VillageSerializer(data=request.data)
-                    if serializer.is_valid():
-                        serializer.save()
-                        count = count + 1;
-                return Response({'status': 'success', 'count': count}, status=status.HTTP_201_CREATED)
             return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
