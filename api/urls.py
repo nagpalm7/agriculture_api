@@ -20,7 +20,7 @@ urlpatterns = [
     path('api/users-list/dda/', views.DdaViewSet.as_view({'get': 'list'}), name='dda-list'),
     path('api/users-list/ado/', views.AdosViewSet.as_view({'get': 'list'}), name='ado-list'),
 
-    path('api/upload/locations/', views.LocationList.as_view(), name='user-detail'),
+    path('api/upload/locations/', views.LocationList.as_view(), name='upload-locations'),
     path('api/location/<int:pk>/', views.LocationDetail.as_view(), name='location-detail'),
     path('api/locations/<str:status>', views.LocationViewSet.as_view({'get': 'list'}), name='admin-location-list'),
     path('api/locations/ado/<str:status>', views.LocationViewSetAdo.as_view({'get': 'list'}), name='ado-location-list'),
@@ -34,6 +34,8 @@ urlpatterns = [
     path('api/report-ado/<int:pk>/', views.AdoReportDetail.as_view(), name='ado-report-detail'),
     path('api/report-ado/add/', views.AddAdoReport.as_view(), name='add-ado-report'),
     path('api/upload/images/', views.ImageView.as_view(), name='upload-images'),
+    # Bulk add village
+    path('api/upload/villages/', views.BulkAddVillage.as_view(), name='upload-villages'),
     # Trigger sms
     path('api/trigger/sms/<str:status>', views.TriggerSMS.as_view(), name='trigger-sms'),
 
