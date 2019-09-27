@@ -628,7 +628,6 @@ class BulkAddVillage(APIView):
                         serializer.save()
                         count = count + 1;
                 return Response({'status': 'success', 'count': count}, status=status.HTTP_201_CREATED)
-            print("error", request.data.location_csv)
             return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
 # BULK ADD ADO
