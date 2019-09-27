@@ -94,10 +94,10 @@ class Village(models.Model):
         return self.village
 
 class Dda(models.Model):
-    name = models.CharField(max_length=200, blank=False, null=True)
+    name = models.CharField(max_length=200, blank=True, null=True)
     district = models.ForeignKey(District, on_delete = models.CASCADE, blank = False, null = False, related_name='dda_district')
-    number = models.CharField(max_length=15, blank=False, null=True)
-    email = models.CharField(max_length=100, blank=False, null=True)
+    number = models.CharField(max_length=15, blank=True, null=True)
+    email = models.CharField(max_length=100, blank=True, null=True)
     auth_user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
@@ -107,10 +107,10 @@ class Dda(models.Model):
         return str(self.name + ' (' + self.district.district + ')')
 
 class Ado(models.Model):
-    name = models.CharField(max_length=200, blank=False, null=True)
-    number = models.CharField(max_length=15, blank=False, null=True)
-    email = models.CharField(max_length=100, blank=False, null=True)
-    village = models.ManyToManyField(Village, related_name='ado_village')
+    name = models.CharField(max_length=200, blank=True, null=True)
+    number = models.CharField(max_length=15, blank=True, null=True)
+    email = models.CharField(max_length=100, blank=True, null=True)
+    village = models.ManyToManyField(Village, related_name='ado_village', blank=True)
     dda = models.ForeignKey(Dda, on_delete = models.CASCADE, blank = True, null = True, related_name='ado_dda')
     auth_user = models.OneToOneField(
         User,

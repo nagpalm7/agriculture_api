@@ -15,7 +15,11 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
+DEPLOYED = False
+if DEPLOYED:
+    DOMAIN = 'http://13.235.100.235:8000/'   # Public IP
+else:
+    DOMAIN = 'http://localhost:8000/'
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 

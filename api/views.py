@@ -8,11 +8,12 @@ from .serializers import *
 from .permissions import *
 from .paginators import *
 import datetime
-from agriculture.settings import MEDIA_ROOT
+from agriculture.settings import MEDIA_ROOT, DOMAIN
 from django.core.files.storage import FileSystemStorage
 import os
 from django.db.models import Q
 import http.client
+import uuid
 
 class UserList(APIView):
     permission_classes = []
@@ -631,6 +632,72 @@ class BulkAddVillage(APIView):
             return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
 # BULK ADD ADO
+class BulkAddAdo(APIView):
+
+    def post(self, request, format = None):
+            directory = MEDIA_ROOT + '/adoCSVs/'
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+
+            ados = []
+            count = 0
+            if 'ado_csv' in request.data:
+                if not request.data['ado_csv'].name.endswith('.csv'):
+                    return Response({'ado_csv': ['Please upload a valid document ending with .csv']},
+                        status = HTTP_400_BAD_REQUEST)
+                fs = FileSystemStorage()
+                fs.save(directory + request.data['ado_csv'].name, request.data['ado_csv'])
+                csvFile = open(directory + request.data['ado_csv'].name, 'r')
+                for line in csvFile.readlines():
+                    ados.append(line)
+                
+                ados.pop(0);
+                # Create a unique filename
+                filename = str(uuid.uuid4()) + '.csv'
+                csvFile = open(directory + filename, 'w')
+                csvFile.write('Username,Password\n')
+                for data in ados:
+                    data = data.split(',')
+                    request.data['name']  = data[0]
+                    request.data['number'] = data[1]
+                    request.data['email'] = data[2]
+                    try:
+                        request.data['village'] = Village.objects.get(village=data[3].upper())
+                    except Village.DoesNotExist:
+                        pass
+
+                    try:
+                        request.data['dda'] = Dda.objects.get(district__district=data[4].upper())
+                    except Dda.DoesNotExist:
+                        pass
+
+                    existing = [user['username'] for user in User.objects.values('username')]
+                    username = uuid.uuid4().hex[:8]
+                    if username in existing:
+                        # Provide random username if username 
+                        # of the form Ado<pk> already exists
+                        username = uuid.uuid4().hex[:8]
+                        while username in existing:
+                            username = uuid.uuid4().hex[:8]
+
+                    # Create user of type student
+                    user = User.objects.create(username=username, type_of_user="ado")
+                    password = uuid.uuid4().hex[:8].lower()
+                    user.set_password(password)
+                    user.save()
+                    request.data['auth_user'] = user.pk
+                    serializer = AddAdoSerializer(data=request.data)
+                    if serializer.is_valid():
+                        serializer.save()
+                        csvFile.write(username + ',' + password + '\n')
+                        count = count + 1;
+                    else:
+                        print(serializer.errors)
+                csvFile.close()
+                absolute_path = DOMAIN + 'media/adoCSVs/'+ filename
+                return Response({'status': 'success', 'count': count, 'csvFile':absolute_path}, status=status.HTTP_201_CREATED)
+            return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
 # BULK ADD VILLAGE
 class BulkAddVillage(APIView):
 
@@ -662,5 +729,4 @@ class BulkAddVillage(APIView):
                         serializer.save()
                         count = count + 1;
                 return Response({'status': 'success', 'count': count}, status=status.HTTP_201_CREATED)
-            print("error", request.data.location_csv)
             return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)

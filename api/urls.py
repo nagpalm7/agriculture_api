@@ -36,6 +36,8 @@ urlpatterns = [
     path('api/upload/images/', views.ImageView.as_view(), name='upload-images'),
     # Bulk add village
     path('api/upload/villages/', views.BulkAddVillage.as_view(), name='upload-villages'),
+    # Bulk add ado
+    path('api/upload/ado/', views.BulkAddAdo.as_view(), name='upload-ado'),
     # Trigger sms
     path('api/trigger/sms/<str:status>', views.TriggerSMS.as_view(), name='trigger-sms'),
 
