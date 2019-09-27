@@ -621,6 +621,7 @@ class BulkAddVillage(APIView):
 
                 for data in villages:
                     data = data.split(',')
+                    print(data)
                     request.data['village']  = data[0]
                     request.data['village_code'] = data[1]
                     serializer = VillageSerializer(data=request.data)
