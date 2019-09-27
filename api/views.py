@@ -106,7 +106,7 @@ class UserDetail(APIView):
 class DDAList(APIView):
     permission_classes = []
     def get(self, request, format = None):
-        ddas = Dda.objects.all().order_by('-pk')
+        ddas = Dda.objects.all().order_by('name')
         serializer = DdaSerializer(ddas, many=True)
         return Response(serializer.data)
 
@@ -168,7 +168,7 @@ class VillageViewSet(viewsets.ReadOnlyModelViewSet):
 
 class VillageList(APIView):
     def get(self, request, format = None):
-        villages = Village.objects.all().order_by('-pk')
+        villages = Village.objects.all().order_by('village')
         serializer = VillageSerializer(villages, many=True)
         return Response(serializer.data)
 
@@ -629,4 +629,38 @@ class BulkAddVillage(APIView):
                 return Response({'status': 'success', 'count': count}, status=status.HTTP_201_CREATED)
             print("error", request.data.location_csv)
             return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
 # BULK ADD ADO
+# BULK ADD VILLAGE
+class BulkAddVillage(APIView):
+
+    def post(self, request, format = None):
+            directory = MEDIA_ROOT + '/villageCSV/'
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+
+            villages = []
+            count = 0
+            if 'village_csv' in request.data:
+                if not request.data['village_csv'].name.endswith('.csv'):
+                    return Response({'village_csv': ['Please upload a valid document ending with .csv']},
+                        status = HTTP_400_BAD_REQUEST)
+                fs = FileSystemStorage()
+                fs.save(directory + request.data['village_csv'].name, request.data['village_csv'])
+                csvFile = open(directory + request.data['village_csv'].name, 'r')
+                for line in csvFile.readlines():
+                    villages.append(line)
+                
+                villages.pop(0);
+
+                for data in villages:
+                    data = data.split(',')
+                    request.data['village']  = data[0]
+                    request.data['village_code'] = data[1]
+                    serializer = VillageSerializer(data=request.data)
+                    if serializer.is_valid():
+                        serializer.save()
+                        count = count + 1;
+                return Response({'status': 'success', 'count': count}, status=status.HTTP_201_CREATED)
+            print("error", request.data.location_csv)
+            return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)

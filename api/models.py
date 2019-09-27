@@ -71,7 +71,7 @@ class Admin(models.Model):
 
 class District(models.Model):
     district = models.CharField(max_length = 500, blank = True, null = True, unique = False)
-    district_code = models.CharField(max_length=200, blank=False, null=False)
+    district_code = models.CharField(max_length=200, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if self.district:
@@ -83,7 +83,7 @@ class District(models.Model):
 
 class Village(models.Model):
     village = models.CharField(max_length = 500, blank = True, null = True, unique = False)
-    village_code = models.CharField(max_length=200, blank=False, null=False)
+    village_code = models.CharField(max_length=200, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if self.village:
