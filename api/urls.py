@@ -34,6 +34,8 @@ urlpatterns = [
     path('api/report-ado/<int:pk>/', views.AdoReportDetail.as_view(), name='ado-report-detail'),
     path('api/report-ado/add/', views.AddAdoReport.as_view(), name='add-ado-report'),
     path('api/upload/images/', views.ImageView.as_view(), name='upload-images'),
+    # Trigger sms
+    path('api/trigger/sms/<str:status>', views.TriggerSMS.as_view(), name='trigger-sms'),
 
 ]
 

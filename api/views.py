@@ -12,6 +12,7 @@ from agriculture.settings import MEDIA_ROOT
 from django.core.files.storage import FileSystemStorage
 import os
 from django.db.models import Q
+import http.client
 
 class UserList(APIView):
     permission_classes = []
@@ -570,3 +571,27 @@ class AdoReportDetail(APIView):
         report = self.get_object(pk)
         report.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+# Trigger sms notification for locations
+class TriggerSMS(APIView):
+
+    def get(self, request, status, format = None):
+        locations = Location.objects.filter(status=status)
+        for location in locations:
+            if location.dda:
+                conn = http.client.HTTPSConnection("api.msg91.com")
+                conn.request(
+                    "GET",
+                    "/api/sendhttp.php?mobiles=" + location.dda.number + "&authkey=296120Ad3QCLsOkZI5d8d6bd5&route=4" +
+                    "&sender=GNSCOA&message=You have some pending locations Please check the app for more details" + "&country=91"
+                )
+                res = conn.getresponse()
+            if location.ado:
+                conn = http.client.HTTPSConnection("api.msg91.com")
+                conn.request(
+                    "GET",
+                    "/api/sendhttp.php?mobiles=" + location.ado.number + "&authkey=296120Ad3QCLsOkZI5d8d6bd5&route=4" +
+                    "&sender=GNSCOA&message=You have some pending locations Please check the app for more details" + "&country=91"
+                )
+                res = conn.getresponse()
+        return Response({'status':200, 'result':'SMS sent successfully'})
