@@ -632,7 +632,7 @@ class BulkAddVillage(APIView):
                 return Response({'status': 'success', 'count': count}, status=status.HTTP_201_CREATED)
             return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
-# BULK ADD VILLAGE
+# BULK ADD District
 class BulkAddDistrict(APIView):
 
     def post(self, request, format = None):
@@ -650,7 +650,7 @@ class BulkAddDistrict(APIView):
                 fs.save(directory + request.data['district_csv'].name, request.data['district_csv'])
                 csvFile = open(directory + request.data['district_csv'].name, 'r')
                 for line in csvFile.readlines():
-                    villages.append(line)
+                    districts.append(line)
                 
                 districts.pop(0);
 
