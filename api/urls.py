@@ -40,6 +40,8 @@ urlpatterns = [
     path('api/upload/districts/', views.BulkAddDistrict.as_view(), name='upload-districts'),
     # Bulk add ado
     path('api/upload/ado/', views.BulkAddAdo.as_view(), name='upload-ado'),
+    # Bulk add ado
+    path('api/upload/dda/', views.BulkAddDda.as_view(), name='upload-dda'),
     # Trigger sms
     path('api/trigger/sms/<str:status>', views.TriggerSMS.as_view(), name='trigger-sms'),
 

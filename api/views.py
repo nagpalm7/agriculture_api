@@ -665,7 +665,7 @@ class BulkAddDistrict(APIView):
                 return Response({'status': 'success', 'count': count}, status=status.HTTP_201_CREATED)
             return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
-# BULK ADD ADO
+# BULK ADD DDA
 class BulkAddDda(APIView):
 
     def post(self, request, format = None):
