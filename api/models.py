@@ -95,7 +95,7 @@ class Village(models.Model):
 
 class Dda(models.Model):
     name = models.CharField(max_length=200, blank=True, null=True)
-    district = models.ForeignKey(District, on_delete = models.CASCADE, blank = False, null = False, related_name='dda_district')
+    district = models.ForeignKey(District, on_delete = models.CASCADE, blank = True, null = True, related_name='dda_district')
     number = models.CharField(max_length=15, blank=True, null=True)
     email = models.CharField(max_length=100, blank=True, null=True)
     auth_user = models.OneToOneField(
