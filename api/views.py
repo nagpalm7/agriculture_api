@@ -27,6 +27,7 @@ class UserList(APIView):
         username = data.get('username')
         password = data.get('password') 
         type_of_user = data.get('type_of_user')
+        print(type_of_user, data)
         try:
             django_user_obj = User.objects.create(username=username, type_of_user=type_of_user)
         except IntegrityError as e:
