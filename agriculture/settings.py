@@ -92,7 +92,7 @@ if DEPLOYED:
             'NAME': 'myproject',
             'USER': 'myprojectuser',
             'PASSWORD': 'password',
-            'HOST': '13.235.100.235',
+            'HOST': 'localhost',
             'PORT': '',
         }
     }
