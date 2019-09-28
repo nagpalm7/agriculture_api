@@ -632,6 +632,39 @@ class BulkAddVillage(APIView):
                 return Response({'status': 'success', 'count': count}, status=status.HTTP_201_CREATED)
             return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
+# BULK ADD VILLAGE
+class BulkAddDistrict(APIView):
+
+    def post(self, request, format = None):
+            directory = MEDIA_ROOT + '/districtCSV/'
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+
+            districts = []
+            count = 0
+            if 'district_csv' in request.data:
+                if not request.data['district_csv'].name.endswith('.csv'):
+                    return Response({'district_csv': ['Please upload a valid document ending with .csv']},
+                        status = HTTP_400_BAD_REQUEST)
+                fs = FileSystemStorage()
+                fs.save(directory + request.data['district_csv'].name, request.data['district_csv'])
+                csvFile = open(directory + request.data['district_csv'].name, 'r')
+                for line in csvFile.readlines():
+                    villages.append(line)
+                
+                districts.pop(0);
+
+                for data in districts:
+                    data = data.split(',')
+                    request.data['district']  = data[0]
+                    request.data['district_code'] = data[1]
+                    serializer = DistrictSerializer(data=request.data)
+                    if serializer.is_valid():
+                        serializer.save()
+                        count = count + 1;
+                return Response({'status': 'success', 'count': count}, status=status.HTTP_201_CREATED)
+            return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
 # BULK ADD ADO
 class BulkAddAdo(APIView):
 
