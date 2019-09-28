@@ -666,6 +666,69 @@ class BulkAddDistrict(APIView):
             return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
 # BULK ADD ADO
+class BulkAddDda(APIView):
+
+    def post(self, request, format = None):
+            directory = MEDIA_ROOT + '/ddaCSVs/'
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+
+            ddas = []
+            count = 0
+            if 'dda_csv' in request.data:
+                if not request.data['dda_csv'].name.endswith('.csv'):
+                    return Response({'dda_csv': ['Please upload a valid document ending with .csv']},
+                        status = HTTP_400_BAD_REQUEST)
+                fs = FileSystemStorage()
+                fs.save(directory + request.data['dda_csv'].name, request.data['dda_csv'])
+                csvFile = open(directory + request.data['dda_csv'].name, 'r')
+                for line in csvFile.readlines():
+                    ddas.append(line)
+                
+                ddas.pop(0);
+                # Create a unique filename
+                filename = str(uuid.uuid4()) + '.csv'
+                csvFile = open(directory + filename, 'w')
+                csvFile.write('Name,Username,Password\n')
+                for data in ddas:
+                    data = data.split(',')
+                    request.data['name']  = data[0]
+                    request.data['number'] = data[1]
+                    request.data['email'] = data[2]
+
+                    try:
+                        request.data['district'] = District.objects.get(district=data[3].upper())
+                    except Dda.DoesNotExist:
+                        pass
+
+                    existing = [user['username'] for user in User.objects.values('username')]
+                    username = uuid.uuid4().hex[:8]
+                    if username in existing:
+                        # Provide random username if username 
+                        # of the form Ado<pk> already exists
+                        username = uuid.uuid4().hex[:8]
+                        while username in existing:
+                            username = uuid.uuid4().hex[:8]
+
+                    # Create user of type student
+                    user = User.objects.create(username=username, type_of_user="dda")
+                    password = uuid.uuid4().hex[:8].lower()
+                    user.set_password(password)
+                    user.save()
+                    request.data['auth_user'] = user.pk
+                    serializer = AddDdaSerializer(data=request.data)
+                    if serializer.is_valid():
+                        serializer.save()
+                        csvFile.write(data[0] + ',' + username + ',' + password + '\n')
+                        count = count + 1;
+                    else:
+                        print(serializer.errors)
+                csvFile.close()
+                absolute_path = DOMAIN + 'media/ddaCSVs/'+ filename
+                return Response({'status': 'success', 'count': count, 'csvFile':absolute_path}, status=status.HTTP_201_CREATED)
+            return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
+# BULK ADD ADO
 class BulkAddAdo(APIView):
 
     def post(self, request, format = None):
