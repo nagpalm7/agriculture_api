@@ -45,7 +45,7 @@ class UserList(APIView):
         elif type_of_user == 'dda':
             serializer = AddDdaSerializer(data=data)
         elif type_of_user == 'ado':
-            villages = data.get('village')
+            villages = data.get('village[]')
             serializer = AddAdoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
