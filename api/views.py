@@ -39,24 +39,24 @@ class UserList(APIView):
         del data['password']
         serializer = []
         villages = []
-        print(data)
         if type_of_user == 'admin':
             serializer = AddAdminSerializer(data=data)
         elif type_of_user == 'dda':
             serializer = AddDdaSerializer(data=data)
         elif type_of_user == 'ado':
             villages = data.get('village[]')
+            print(villages)
             serializer = AddAdoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            if type_of_user == 'ado':
-                try:
-                    ado = Ado.objects.get(id = serializer.data['id'])
-                except Ado.DoesNotExist:
-                    ado = None
-                if ado:
-                    ado.village.set(villages)
-                    ado.save()
+            # if type_of_user == 'ado':
+            #     try:
+            #         ado = Ado.objects.get(id = serializer.data['id'])
+            #     except Ado.DoesNotExist:
+            #         ado = None
+            #     if ado:
+            #         ado.village.set(villages)
+            #         ado.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
