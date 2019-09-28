@@ -38,14 +38,25 @@ class UserList(APIView):
         del data['username']
         del data['password']
         serializer = []
+        villages = []
         if type_of_user == 'admin':
             serializer = AddAdminSerializer(data=data)
         elif type_of_user == 'dda':
             serializer = AddDdaSerializer(data=data)
         elif type_of_user == 'ado':
+            villages = data['villages']
+            del data['villages']
             serializer = AddAdoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
+            if type_of_user == 'ado':
+                try:
+                    ado = Ado.objects.get(id = serializer.data['id'])
+                except Ado.DoesNotExist:
+                    ado = None
+                if ado:
+                    ado.village.set(villages)
+                    ado.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -77,6 +88,7 @@ class UserDetail(APIView):
         type_of_user = user.type_of_user
         data = []
         serializer = []
+        villages = []
         if type_of_user == 'admin':
             data = Admin.objects.get(auth_user=pk)
             serializer = AddAdminSerializer(data, request.data, partial=True)
@@ -88,6 +100,14 @@ class UserDetail(APIView):
             serializer = AddAdoSerializer(data, request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            if type_of_user == 'ado':
+                try:
+                    ado = Ado.objects.get(id = serializer.data['id'])
+                except Ado.DoesNotExist:
+                    ado = None
+                if ado:
+                    ado.village.set(villages)
+                    ado.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
