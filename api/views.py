@@ -423,7 +423,7 @@ class LocationList(APIView):
                         del request.data['dda']
 
                 try:
-                    ado = Ado.objects.get(village__village=data[3].upper())
+                    ado = Ado.objects.get(village__village__icontains=data[3].upper())
                     request.data['ado'] = ado.pk
                 except Ado.DoesNotExist:
                     if 'ado' in request.data:
@@ -792,7 +792,7 @@ class BulkAddAdo(APIView):
                             villages = data[3].split('|')
                             for village in villages:
                                 try:
-                                    village = Village.objects.get(village=village.upper().strip())
+                                    village = Village.objects.get(village__icontains=village.upper().strip())
                                     arr.append(int(village.id))
                                 except Village.DoesNotExist:
                                     pass

@@ -85,6 +85,7 @@ class District(models.Model):
 class Village(models.Model):
     village = models.CharField(max_length = 500, blank = True, null = True, unique = False)
     village_code = models.CharField(max_length=200, blank=True, null=True)
+    district = models.ForeignKey(District, on_delete = models.CASCADE, blank = True, null = True, related_name='village_district')
 
     def save(self, *args, **kwargs):
         if self.village:
@@ -105,7 +106,10 @@ class Dda(models.Model):
     )
 
     def __str__(self):
-        return str(self.name + ' (' + self.district.district + ')')
+        if district:
+            return str(self.name + ' (' + self.district.district + ')')
+        else:
+            return str(self.name)
 
 class Ado(models.Model):
     name = models.CharField(max_length=200, blank=True, null=True)
