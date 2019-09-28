@@ -133,6 +133,8 @@ REST_FRAMEWORK = {
     ],
 }
 
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1002000 # higher than the count of fields
+
 #Custom user
 AUTH_USER_MODEL = 'api.User'
 
