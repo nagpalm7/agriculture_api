@@ -169,6 +169,7 @@ class VillageViewSet(viewsets.ReadOnlyModelViewSet):
         return villages
 
 class VillageList(APIView):
+    permission_classes = []
     def get(self, request, format = None):
         villages = Village.objects.all().order_by('village')
         serializer = VillageSerializer(villages, many=True)
