@@ -161,7 +161,7 @@ class AdoReport(models.Model):
     remarks = models.CharField(max_length = 500, blank = True, null = True, unique = False)
     amount = models.CharField(max_length = 500, blank = True, null = True, unique = False)
     ownership = models.CharField(max_length = 50, blank = True, null = True, unique = False)
-    action = models.CharField(max_length = 50, choices = actions, blank = True, null = True, unique = False)
+    action = models.CharField(max_length = 50, choices = actions, blank = True, null = True, unique = False, default='FIR')
     location = models.ForeignKey(Location, on_delete = models.CASCADE)
 
     def __str__(self):
