@@ -15,7 +15,7 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-DEPLOYED = False
+DEPLOYED = True
 if DEPLOYED:
     DOMAIN = 'http://13.235.100.235:8000/'   # Public IP
 else:
