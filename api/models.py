@@ -11,6 +11,7 @@ from django.db.models import Q
 
 userTypes = ( ('admin','admin'),('dda','dda'), ('ado', 'ado') )
 actions = ( ('chalaan','Challan'),('FIR','FIR') )
+actions = ( ('start','Start'),('stop','Stop') )
 choices_status = ( ('pending','pending'),('ongoing','ongoing'),('completed','completed') )
 
 # --------------------- MODELS ----------------------
@@ -162,6 +163,7 @@ class AdoReport(models.Model):
     amount = models.CharField(max_length = 500, blank = True, null = True, unique = False)
     ownership = models.CharField(max_length = 50, blank = True, null = True, unique = False)
     action = models.CharField(max_length = 50, choices = actions, blank = True, null = True, unique = False, default='FIR')
+    flag = models.CharField(max_length = 50, choices = flags, blank = True, null = True, unique = False)
     location = models.ForeignKey(Location, on_delete = models.CASCADE)
 
     def __str__(self):
