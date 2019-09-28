@@ -610,7 +610,6 @@ class BulkAddVillage(APIView):
             villages = []
             count = 0
             if 'village_csv' in request.data:
-                print(request.data['village_csv'])
                 if not request.data['village_csv'].name.endswith('.csv'):
                     return Response({'village_csv': ['Please upload a valid document ending with .csv']},
                         status = HTTP_400_BAD_REQUEST)
@@ -626,7 +625,6 @@ class BulkAddVillage(APIView):
                     data = data.split(',')
                     request.data['village']  = data[0]
                     request.data['village_code'] = data[1]
-                    print(data[2])
                     try:
                         district = District.objects.get(district_code=data[2].strip())
                     except District.DoesNotExist:
