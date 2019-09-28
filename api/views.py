@@ -27,7 +27,6 @@ class UserList(APIView):
         username = data.get('username')
         password = data.get('password') 
         type_of_user = data.get('type_of_user')
-        print(type_of_user, data)
         try:
             django_user_obj = User.objects.create(username=username, type_of_user=type_of_user)
         except IntegrityError as e:
@@ -45,21 +44,9 @@ class UserList(APIView):
         elif type_of_user == 'dda':
             serializer = AddDdaSerializer(data=data)
         elif type_of_user == 'ado':
-            villages = data.get('village')
-            # data['village'] = villages
-            # del data['village']
-            print(villages)
             serializer = AddAdoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            # if type_of_user == 'ado':
-            #     try:
-            #         ado = Ado.objects.get(id = serializer.data['id'])
-            #     except Ado.DoesNotExist:
-            #         ado = None
-            #     if ado:
-            #         ado.village.set(villages)
-            #         ado.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -91,7 +78,6 @@ class UserDetail(APIView):
         type_of_user = user.type_of_user
         data = []
         serializer = []
-        villages = []
         if type_of_user == 'admin':
             data = Admin.objects.get(auth_user=pk)
             serializer = AddAdminSerializer(data, request.data, partial=True)
@@ -103,15 +89,6 @@ class UserDetail(APIView):
             serializer = AddAdoSerializer(data, request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            if type_of_user == 'ado':
-                try:
-                    ado = Ado.objects.get(id = serializer.data['id'])
-                except Ado.DoesNotExist:
-                    ado = None
-                if ado:
-                    villages = request.data.get('village')
-                    ado.village.set(villages)
-                    ado.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
