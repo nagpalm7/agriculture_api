@@ -626,6 +626,7 @@ class BulkAddVillage(APIView):
                     data = data.split(',')
                     request.data['village']  = data[0]
                     request.data['village_code'] = data[1]
+                    print(data[2])
                     try:
                         district = District.objects.get(district_code=data[2])
                     except District.DoesNotExist:
@@ -635,7 +636,7 @@ class BulkAddVillage(APIView):
                             district = District.objects.get(district__icontains=data[2].upper())
                         except District.DoesNotExist:
                             district = None
-                    if district:
+                    if district != None:
                         request.data['district'] = district.id
                     serializer = VillageSerializer(data=request.data)
                     if serializer.is_valid():
