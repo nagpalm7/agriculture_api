@@ -628,12 +628,12 @@ class BulkAddVillage(APIView):
                     request.data['village_code'] = data[1]
                     print(data[2])
                     try:
-                        district = District.objects.get(district_code=data[2])
+                        district = District.objects.get(district_code=data[2].strip())
                     except District.DoesNotExist:
                         district = None
                     if district == None:
                         try:
-                            district = District.objects.get(district__icontains=data[2].upper())
+                            district = District.objects.get(district__icontains=data[2].upper().strip())
                         except District.DoesNotExist:
                             district = None
                     if district != None:
