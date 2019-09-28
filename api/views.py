@@ -39,6 +39,7 @@ class UserList(APIView):
         del data['password']
         serializer = []
         villages = []
+        print(data)
         if type_of_user == 'admin':
             serializer = AddAdminSerializer(data=data)
         elif type_of_user == 'dda':
