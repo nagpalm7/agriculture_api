@@ -698,7 +698,7 @@ class BulkAddDda(APIView):
 
                     try:
                         request.data['district'] = District.objects.get(district=data[3].upper())
-                    except Dda.DoesNotExist:
+                    except District.DoesNotExist:
                         pass
 
                     existing = [user['username'] for user in User.objects.values('username')]
