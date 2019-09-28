@@ -11,7 +11,7 @@ from django.db.models import Q
 
 userTypes = ( ('admin','admin'),('dda','dda'), ('ado', 'ado') )
 actions = ( ('chalaan','Challan'),('FIR','FIR') )
-actions = ( ('start','Start'),('stop','Stop') )
+flags = ( ('start','Start'),('stop','Stop') )
 choices_status = ( ('pending','pending'),('ongoing','ongoing'),('completed','completed') )
 
 # --------------------- MODELS ----------------------
