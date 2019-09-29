@@ -698,17 +698,20 @@ class BulkAddDda(APIView):
                     request.data['name']  = data[0]
                     request.data['number'] = data[1]
                     request.data['email'] = data[2]
-
+                    district = None
                     try:
-                        request.data['district'] = District.objects.get(district=data[3].upper().strip())
+                        district = District.objects.get(district=data[3].upper().strip())
                     except District.DoesNotExist:
                         pass
 
                     try:
-                        request.data['district'] = District.objects.get(district_code=data[3].strip())
+                        district = District.objects.get(district_code=data[3].strip())
                     except District.DoesNotExist:
                         pass
 
+                    if district != None:
+                        request.data['district'] = district.id
+                        
                     existing = [user['username'] for user in User.objects.values('username')]
                     username = data[4].strip()
                     if username in existing:
