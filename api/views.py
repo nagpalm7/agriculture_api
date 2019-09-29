@@ -705,7 +705,7 @@ class BulkAddDda(APIView):
                         pass
 
                     try:
-                        request.data['district'] = District.objects.get(district=data[3].upper().strip())
+                        request.data['district'] = District.objects.get(district_code=data[3].strip())
                     except District.DoesNotExist:
                         pass
 
