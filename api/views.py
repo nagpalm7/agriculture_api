@@ -771,10 +771,11 @@ class BulkAddAdo(APIView):
                     request.data['email'] = data[3]
 
                     try:
-                        request.data['dda'] = Dda.objects.get(district__district_code=data[4].strip())
+                        dda = Dda.objects.get(district__district_code=data[4].strip())
                     except Dda.DoesNotExist:
                         pass
-
+                    if dda:
+                        request.data['dda'] = dda.id
                     existing = [user['username'] for user in User.objects.values('username')]
                     username = data[5]
                     if username in existing:
@@ -801,9 +802,12 @@ class BulkAddAdo(APIView):
                             arr = []
                             villages = data[1].split('|')
                             for village in villages:
-                                village = Village.objects.filter(village__icontains=village.upper().strip()) | Village.objects.filter(village__icontains=village.strip('(')[1].upper().strip(), district__district_code=data[4])
-                                if(len(village) == 1):
-                                    arr.append(int(village[0].id))
+                                print(data[0], village)
+                                obj = Village.objects.filter(village__icontains=village.upper().strip()) | Village.objects.filter(village__icontains=village.split('(')[1].upper().strip(), district__district_code=data[4])
+                                print(obj)
+                                if(len(obj) == 1):
+                                    arr.append(int(obj[0].id))
+                            print(arr)
                             ado.village.set(arr)
                             ado.save()
                         csvFile.write(data[0] + ',' + username + ',' + password + '\n')
