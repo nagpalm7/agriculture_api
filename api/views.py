@@ -711,7 +711,7 @@ class BulkAddDda(APIView):
 
                     if district != None:
                         request.data['district'] = district.id
-                        
+
                     existing = [user['username'] for user in User.objects.values('username')]
                     username = data[4].strip()
                     if username in existing:
@@ -767,16 +767,16 @@ class BulkAddAdo(APIView):
                 for data in ados:
                     data = data.split(',')
                     request.data['name']  = data[0]
-                    request.data['number'] = data[1]
-                    request.data['email'] = data[2]
+                    request.data['number'] = data[2]
+                    request.data['email'] = data[3]
 
                     try:
-                        request.data['dda'] = Dda.objects.get(district__district=data[4].upper())
+                        request.data['dda'] = Dda.objects.get(district__district_code=data[4].strip())
                     except Dda.DoesNotExist:
                         pass
 
                     existing = [user['username'] for user in User.objects.values('username')]
-                    username = uuid.uuid4().hex[:8]
+                    username = data[5]
                     if username in existing:
                         # Provide random username if username 
                         # of the form Ado<pk> already exists
@@ -784,7 +784,7 @@ class BulkAddAdo(APIView):
                         while username in existing:
                             username = uuid.uuid4().hex[:8]
 
-                    # Create user of type student
+                    # Create user of type ado
                     user = User.objects.create(username=username, type_of_user="ado")
                     password = uuid.uuid4().hex[:8].lower()
                     user.set_password(password)
@@ -799,13 +799,11 @@ class BulkAddAdo(APIView):
                             ado = None
                         if ado:
                             arr = []
-                            villages = data[3].split('|')
+                            villages = data[1].split('|')
                             for village in villages:
-                                try:
-                                    village = Village.objects.get(village__icontains=village.upper().strip())
-                                    arr.append(int(village.id))
-                                except Village.DoesNotExist:
-                                    pass
+                                village = Village.objects.filter(village__icontains=village.upper().strip()) || Village.objects.filter(village__icontains=village.strip('(')[1].upper().strip(), district__district_code=data[4])
+                                    if(len(village) == 1):
+                                        arr.append(int(village[0].id))
                             ado.village.set(arr)
                             ado.save()
                         csvFile.write(data[0] + ',' + username + ',' + password + '\n')
