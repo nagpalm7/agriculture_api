@@ -801,7 +801,7 @@ class BulkAddAdo(APIView):
                             arr = []
                             villages = data[1].split('|')
                             for village in villages:
-                                village = Village.objects.filter(village__icontains=village.upper().strip()) || Village.objects.filter(village__icontains=village.strip('(')[1].upper().strip(), district__district_code=data[4])
+                                village = Village.objects.filter(village__icontains=village.upper().strip()) | Village.objects.filter(village__icontains=village.strip('(')[1].upper().strip(), district__district_code=data[4])
                                     if(len(village) == 1):
                                         arr.append(int(village[0].id))
                             ado.village.set(arr)
