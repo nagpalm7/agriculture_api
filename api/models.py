@@ -106,7 +106,7 @@ class Dda(models.Model):
     )
 
     def __str__(self):
-        if district:
+        if self.district:
             return str(self.name + ' (' + self.district.district + ')')
         else:
             return str(self.name)

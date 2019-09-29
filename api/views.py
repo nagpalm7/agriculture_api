@@ -700,12 +700,17 @@ class BulkAddDda(APIView):
                     request.data['email'] = data[2]
 
                     try:
-                        request.data['district'] = District.objects.get(district=data[3].upper())
+                        request.data['district'] = District.objects.get(district=data[3].upper().strip())
+                    except District.DoesNotExist:
+                        pass
+
+                    try:
+                        request.data['district'] = District.objects.get(district=data[3].upper().strip())
                     except District.DoesNotExist:
                         pass
 
                     existing = [user['username'] for user in User.objects.values('username')]
-                    username = uuid.uuid4().hex[:8]
+                    username = data[4].strip()
                     if username in existing:
                         # Provide random username if username 
                         # of the form Ado<pk> already exists
