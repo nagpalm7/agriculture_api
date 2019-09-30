@@ -777,7 +777,9 @@ class BulkAddAdo(APIView):
                     if dda:
                         request.data['dda'] = dda.id
                     existing = [user['username'] for user in User.objects.values('username')]
-                    username = data[5]
+                    username = data[5].rstrip()
+                    if(len(username)<1):
+                        username = uuid.uuid4().hex[:8]
                     if username in existing:
                         # Provide random username if username 
                         # of the form Ado<pk> already exists
