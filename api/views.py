@@ -379,7 +379,7 @@ class AdoViewSet(viewsets.ReadOnlyModelViewSet):
             dda = Dda.objects.get(auth_user=self.request.user.pk)
         except Dda.DoesNotExist:
             raise Http404
-        ados = Ado.objects.filter(dda = dda).order_by('-pk')
+        ados = Ado.objects.filter(dda = dda).order_by('dda__district__district')
         return ados
 
 # Upload CSV
@@ -416,19 +416,13 @@ class LocationList(APIView):
                 request.data['acq_date'] = datetime.datetime.strptime(data[6], '%d/%m/%Y').strftime('%Y-%m-%d')
                 request.data['acq_time'] = data[7].split('.')[0]
                 # request.data['csv_file'] = MEDIA_ROOT + 'locationCSVs/' + request.data['location_csv'].name
-                try:
-                    dda = Dda.objects.get(district__district=data[1].upper())
-                    request.data['dda'] = dda.pk
-                except Dda.DoesNotExist:
-                    if 'dda' in request.data:
-                        del request.data['dda']
+                dda = Location.objects.filter(district__district=data[1].rstrip().upper())
+                if(len(dda)>=1):
+                    request.data['dda'] = dda[0].pk
 
-                try:
-                    ado = Ado.objects.get(village__village__icontains=data[3].upper())
-                    request.data['ado'] = ado.pk
-                except Ado.DoesNotExist:
-                    if 'ado' in request.data:
-                        del request.data['ado']
+                ado = Ado.objects.get(village__village__icontains=data[3].rstrip().upper())
+                if len(ado)>=1:
+                    request.data['ado'] = ado[0].pk
                 # print("dda", request.data['csv_file'])
                 serializer = AddLocationSerializer(data=request.data)
                 if serializer.is_valid():
