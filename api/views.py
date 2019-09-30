@@ -417,7 +417,7 @@ class LocationList(APIView):
                 request.data['acq_time'] = data[7].split('.')[0]
                 # request.data['csv_file'] = MEDIA_ROOT + 'locationCSVs/' + request.data['location_csv'].name
                 dda = []
-                dda = dda.objects.filter(district__district=data[1].rstrip().upper())
+                dda = Dda.objects.filter(district__district=data[1].rstrip().upper())
                 if(len(dda)>=1):
                     request.data['dda'] = dda[0].pk
                 ado = []
