@@ -413,7 +413,7 @@ class LocationList(APIView):
                 request.data['village_name'] = data[3]
                 request.data['longitude'] = data[4]
                 request.data['latitude'] = data[5]
-                request.data['acq_date'] = datetime.datetime.strptime(data[6], '%d/%m/%Y').strftime('%Y-%m-%d')
+                request.data['acq_date'] = datetime.datetime.strptime(data[6], '%m/%d/%Y').strftime('%Y-%m-%d')
                 request.data['acq_time'] = data[7].split('.')[0]
                 # request.data['csv_file'] = MEDIA_ROOT + 'locationCSVs/' + request.data['location_csv'].name
                 dda = Location.objects.filter(district__district=data[1].rstrip().upper())
