@@ -640,16 +640,21 @@ class BulkAddVillage(APIView):
                 villages.pop(0);
 
                 for data in villages:
+                    print(data)
                     data = data.split(',')
                     village = []
                     village = data[0].split('(')
                     request.data['village']  = village[0].strip()
+                    print(len(village) > 1)
                     if len(village) > 1:
                         request.data['village_subcode'] = village[1].split(')')[0].strip()
+                    else:
+                        request.data['village_subcode'] = ''
                     request.data['village_code'] = data[1].strip()
                     district = District.objects.filter(district_code=data[2].rstrip())
                     if len(district) == 1:
                         request.data['district'] = district[0].id
+                    del village
                     serializer = VillageSerializer(data=request.data)
                     if serializer.is_valid():
                         serializer.save()
@@ -824,6 +829,7 @@ class BulkAddAdo(APIView):
                             ado = None
                         if ado:
                             arr = []
+                            villages = []
                             villages = data[1].split('|')
                             for village in villages:
                                 # TODO:-
