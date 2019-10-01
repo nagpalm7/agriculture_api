@@ -641,6 +641,7 @@ class BulkAddVillage(APIView):
 
                 for data in villages:
                     data = data.split(',')
+                    village = []
                     village = data[0].split('(')
                     request.data['village']  = village[0].strip()
                     if len(village) > 1:
