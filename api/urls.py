@@ -46,6 +46,7 @@ urlpatterns = [
     path('api/upload/dda/', views.BulkAddDda.as_view(), name='upload-dda'),
     # Trigger sms
     path('api/trigger/sms/<str:status>', views.TriggerSMS.as_view(), name='trigger-sms'),
+    path('api/ado/csv/', views.GetListAdo.as_view(), name='print-ado'),
     path('api/ado-export-pdf/',views.ExportAdoPdf),
     path('api/generate-passwords-ado/',views.GeneratePasswordsForAdo.as_view()),
 ]

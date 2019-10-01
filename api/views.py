@@ -843,12 +843,44 @@ class BulkAddAdo(APIView):
 
 def ExportAdoPdf(request):
     dictV ={}
-    AdoObjects = Dda.objects.all()
+    AdoObjects = Ado.objects.all()
     dictV['objects'] = AdoObjects
     print('starting')
     content = render_to_pdf('AdoExportPdf.html',dictV)
     print('ending')
     return HttpResponse(content,content_type = "application/pdf")
+
+class GetListAdo(APIView):
+
+    def get(self, request, format = None):
+        directory = MEDIA_ROOT + '/list/'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        filename = 'list.csv'
+        csvFile = open(directory + filename, 'w')
+        csvFile.write('Name,Email,Number, DDA, Villages\n')
+        ados = Ado.objects.all()
+        for ado in ados:
+            name = ado.name
+            email = ado.email
+            number = ado.number
+            dda_name = ''
+            district = ''
+            if ado.dda:
+                dda_name = ado.dda.name
+                if ado.dda.district:
+                    district = ado.dda.district.district
+            villages = []
+            dda = dda_name + '(' + district + ')'
+            objects = ado.village.all()
+            for village in objects:
+                villages.append(village.village)
+            print(villages)
+            villages = '|'.join(villages)
+            csvFile.write(name + ',' + email + ',' + number + ',' + dda + ',' + villages + '\n')
+        csvFile.close()
+        absolute_path = DOMAIN + 'media/list/'+ filename
+        return Response({'status': 200, 'csvFile':absolute_path})
 
 class GeneratePasswordsForAdo(APIView):
 
