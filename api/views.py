@@ -162,7 +162,7 @@ class VillageViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
     filter_backends = (filters.SearchFilter, )
-    search_fields = ('village', )
+    search_fields = ('village', 'village_code',)
 
     def get_queryset(self):
         villages = Village.objects.all().order_by('-pk')
@@ -229,8 +229,8 @@ class DdaViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, )
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
-    # filter_backends = (filters.SearchFilter, )
-    # search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('name', 'number', 'email', 'district__district',)
 
     def get_queryset(self):
         ddas = Dda.objects.all().order_by('-pk')
@@ -243,8 +243,8 @@ class AdosViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, )
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
-    # filter_backends = (filters.SearchFilter, )
-    # search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ( 'name', 'number', 'email', 'dda__district__district', 'village__village',)
 
     def get_queryset(self):
         ados = Ado.objects.all().order_by('-pk')
@@ -301,8 +301,8 @@ class LocationViewSet(viewsets.ReadOnlyModelViewSet):
     # permission_classes = (permissions.IsAuthenticated, IsSuperadmin, )
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
-    # filter_backends = (filters.SearchFilter, )
-    # search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('state', 'block_name', 'village_name', 'dda__name', 'ado__name', 'status', 'district',)
 
     def get_queryset(self):
         stat = self.kwargs['status']
@@ -321,8 +321,8 @@ class LocationViewSetAdo(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, )
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
-    # filter_backends = (filters.SearchFilter, )
-    # search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('state', 'block_name', 'village_name', 'ado__name', 'status', 'district',)
 
     def get_queryset(self):
         try:
@@ -344,8 +344,8 @@ class LocationViewSetDda(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, )
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
-    # filter_backends = (filters.SearchFilter, )
-    # search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('state', 'block_name', 'village_name', 'ado__name', 'status', 'district',)
 
     def get_queryset(self):
         try:
@@ -371,8 +371,8 @@ class AdoViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, )
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
-    # filter_backends = (filters.SearchFilter, )
-    # search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('district__district', 'village__village', 'number', 'name', 'email', 'dda__name',)
 
     def get_queryset(self):
         try:
@@ -440,8 +440,8 @@ class LocationViewSetAdoForAdmin(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, )
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
-    # filter_backends = (filters.SearchFilter, )
-    # search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
 
     def get_queryset(self):
         try:
@@ -463,8 +463,8 @@ class LocationViewSetDdaForAdmin(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, )
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
-    # filter_backends = (filters.SearchFilter, )
-    # search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('state', 'block_name', 'village_name', 'ado__name', 'status', 'district',)
 
     def get_queryset(self):
         try:
@@ -491,9 +491,9 @@ class LocationDistrictWiseViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = ( )
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
-    # filter_backends = (filters.SearchFilter, )
-    # search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
-
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('state', 'block_name', 'village_name', 'ado__name', 'status', 'district',)
+    
     def get_queryset(self):
         try:
             district = District.objects.get(id=self.kwargs['pk'])
@@ -526,6 +526,25 @@ class ImageView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# List of villages district wise and filtered
+class VillagesDistrictWiseViewSet(viewsets.ReadOnlyModelViewSet):
+
+    model = Village
+    serializer_class = VillageSerializer
+    permission_classes = ( )
+    pagination_class = StandardResultsSetPagination
+    # Making endpoint searchable
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('village')
+
+    def get_queryset(self):
+        try:
+            district = District.objects.get(id=self.kwargs['pk'])
+        except District.DoesNotExist:
+            raise Http404
+        villages = Village.objects.filter(district = district)
+        return villages
 
 # ADO reports Views
 class AddAdoReport(APIView):

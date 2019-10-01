@@ -19,7 +19,9 @@ urlpatterns = [
     path('api/users-list/admin/', views.AdminViewSet.as_view({'get': 'list'}), name='admin-list'),
     path('api/users-list/dda/', views.DdaViewSet.as_view({'get': 'list'}), name='dda-list'),
     path('api/users-list/ado/', views.AdosViewSet.as_view({'get': 'list'}), name='ado-list'),
-
+    # vllages district wise
+    path('api/villages-list/district/<int:pk>/', views.VillagesDistrictWiseViewSet.as_view({'get': 'list'}), name='village-district-list'),
+    
     path('api/upload/locations/', views.LocationList.as_view(), name='upload-locations'),
     path('api/location/<int:pk>/', views.LocationDetail.as_view(), name='location-detail'),
     path('api/locations/<str:status>', views.LocationViewSet.as_view({'get': 'list'}), name='admin-location-list'),
