@@ -825,7 +825,7 @@ class BulkAddAdo(APIView):
                                 if len(village.split('(')) > 1:
                                     obj = Village.objects.filter(village__icontains=village.split('(')[1].upper().strip(), district__district_code=data[4])
                                 else:
-                                    obj = Village.objects.filter(village__icontains=village.upper().strip())
+                                    obj = Village.objects.filter(village__icontains=village.upper().strip(), district__district_code=data[4])
                                 if(len(obj) == 1):
                                     arr.append(int(obj[0].id))
                             print(arr)
@@ -843,9 +843,11 @@ class BulkAddAdo(APIView):
 
 def ExportAdoPdf(request):
     dictV ={}
-    AdoObjects = Ado.objects.all()
+    AdoObjects = Dda.objects.all()
     dictV['objects'] = AdoObjects
+    print('starting')
     content = render_to_pdf('AdoExportPdf.html',dictV)
+    print('ending')
     return HttpResponse(content,content_type = "application/pdf")
 
 class GeneratePasswordsForAdo(APIView):
