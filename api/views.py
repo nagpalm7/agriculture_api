@@ -824,7 +824,7 @@ class BulkAddAdo(APIView):
                             for village in villages:
                                 print(data[0], village)
                                 if len(village.split('(')) > 1:
-                                    obj = Village.objects.filter(village__icontains=village.upper().strip()) | Village.objects.filter(village__icontains=village.split('(')[1].upper().strip(), district__district_code=data[4])
+                                    obj = Village.objects.filter(village__icontains=village.split('(')[1].upper().strip(), district__district_code=data[4])
                                 else:
                                     obj = Village.objects.filter(village__icontains=village.upper().strip())
                                 print(obj)
