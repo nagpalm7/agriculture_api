@@ -844,8 +844,6 @@ class BulkAddAdo(APIView):
 def ExportAdoPdf(request):
     dictV ={}
     AdoObjects = Ado.objects.all()
-    sample_ado_object = Ado.objects.get(id=1)
-    print(sample_ado_object.village.all())
     dictV['objects'] = AdoObjects
     content = render_to_pdf('AdoExportPdf.html',dictV)
     return HttpResponse(content,content_type = "application/pdf")
