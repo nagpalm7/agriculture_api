@@ -111,6 +111,10 @@ class Dda(models.Model):
         else:
             return str(self.name)
 
+
+
+
+
 class Ado(models.Model):
     name = models.CharField(max_length=200, blank=True, null=True)
     number = models.CharField(max_length=15, blank=True, null=True)

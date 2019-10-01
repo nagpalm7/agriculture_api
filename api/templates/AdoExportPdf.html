@@ -1,0 +1,32 @@
+
+
+<html>
+
+<body>
+	<table>
+			<thead >
+				<th>Sno.</th>
+				<th>name</th>
+				<th>email</th>
+				<th>number</th>
+				<th>DDA ASSIGNED</th>
+				<th>Villages</th>
+
+			</thead>
+	{% for object in objects %}
+		<tr style = "margin-bottom:5%;">
+			<td>{{object.id}}</td>
+			<td>{{object.name}}</td>
+			<td>{{object.email}}</td>
+			<td>{{object.number}}</td>
+			<td>{{object.dda.name}}</td>
+			<td>{% for village in object.village.all %}
+					{{village.village}}
+				{% endfor %}
+			</td>
+		</tr>
+
+	{% endfor %}
+	</table>
+	</body>
+</html>

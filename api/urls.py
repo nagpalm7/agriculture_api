@@ -21,7 +21,7 @@ urlpatterns = [
     path('api/users-list/ado/', views.AdosViewSet.as_view({'get': 'list'}), name='ado-list'),
     # vllages district wise
     path('api/villages-list/district/<int:pk>/', views.VillagesDistrictWiseViewSet.as_view({'get': 'list'}), name='village-district-list'),
-    
+
     path('api/upload/locations/', views.LocationList.as_view(), name='upload-locations'),
     path('api/location/<int:pk>/', views.LocationDetail.as_view(), name='location-detail'),
     path('api/locations/<str:status>', views.LocationViewSet.as_view({'get': 'list'}), name='admin-location-list'),
@@ -46,7 +46,8 @@ urlpatterns = [
     path('api/upload/dda/', views.BulkAddDda.as_view(), name='upload-dda'),
     # Trigger sms
     path('api/trigger/sms/<str:status>', views.TriggerSMS.as_view(), name='trigger-sms'),
-
+    path('api/ado-export-pdf/',views.ExportAdoPdf),
+    path('api/generate-passwords-ado/',views.GeneratePasswordsForAdo.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

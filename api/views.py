@@ -15,6 +15,10 @@ from django.db.models import Q
 import http.client
 import uuid
 
+from django.http import HttpResponse
+
+from easy_pdf.rendering import render_to_pdf
+
 class UserList(APIView):
     permission_classes = []
     def get(self, request, format = None):
@@ -704,7 +708,7 @@ class BulkAddDda(APIView):
                 
                 ddas.pop(0);
                 # Create a unique filename
-                filename = str(uuid.uuid4()) + '.csv'
+                filename = 'filename.csv'
                 csvFile = open(directory + filename, 'w')
                 csvFile.write('Name,Username,Password\n')
                 for data in ddas:
@@ -775,7 +779,7 @@ class BulkAddAdo(APIView):
                 
                 ados.pop(0);
                 # Create a unique filename
-                filename = str(uuid.uuid4()) + '.csv'
+                filename = 'filename.csv'
                 csvFile = open(directory + filename, 'w')
                 csvFile.write('Name,Username,Password\n')
                 for data in ados:
@@ -837,3 +841,36 @@ class BulkAddAdo(APIView):
                 absolute_path = DOMAIN + 'media/adoCSVs/'+ filename
                 return Response({'status': 'success', 'count': count, 'csvFile':absolute_path}, status=status.HTTP_201_CREATED)
             return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+def ExportAdoPdf(request):
+    dictV ={}
+    AdoObjects = Ado.objects.all()
+    sample_ado_object = Ado.objects.get(id=1)
+    print(sample_ado_object.village.all())
+    dictV['objects'] = AdoObjects
+    content = render_to_pdf('AdoExportPdf.html',dictV)
+    return HttpResponse(content,content_type = "application/pdf")
+
+class GeneratePasswordsForAdo(APIView):
+
+    def get(self, request, format = None):
+        directory = MEDIA_ROOT + '/password/'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        filename = 'password.csv'
+        csvFile = open(directory + filename, 'w')
+        csvFile.write('Name,Username,Password\n')
+        ados = Ado.objects.all()
+        for ado in ados:
+            try:
+                user = User.objects.get(pk=ado.auth_user.pk)
+            except User.DoesNotExist:
+                continue
+            password = uuid.uuid4().hex[:8].lower()
+            user.set_password(password)
+            user.save()
+            csvFile.write(ado.name + ',' + ado.auth_user.username + ',' + password + '\n')
+        csvFile.close()
+        absolute_path = DOMAIN + 'media/password/'+ filename
+        return Response({'status': 200, 'csvFile':absolute_path})
