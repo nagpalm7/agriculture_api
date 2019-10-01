@@ -642,11 +642,11 @@ class BulkAddVillage(APIView):
                 for data in villages:
                     data = data.split(',')
                     village = data[0].split('(')
-                    request.data['village']  = village[0]
+                    request.data['village']  = village[0].strip()
                     if len(village) > 1:
-                        request.data['village_subcode'] = village[1]
-                    request.data['village_code'] = data[1]
-                    district = District.objects.filter(district_code=data[2].strip())
+                        request.data['village_subcode'] = village[1].strip()
+                    request.data['village_code'] = data[1].strip()
+                    district = District.objects.filter(district_code=data[2].rstrip())
                     if len(district) == 1:
                         request.data['district'] = district[0].id
                     serializer = VillageSerializer(data=request.data)
@@ -828,9 +828,9 @@ class BulkAddAdo(APIView):
                                 # TODO:-
                                 # REMOVE DATA , ADD EXTRA FIELD, ADD 
                                 if len(village.split('(')) > 1:
-                                    obj = Village.objects.filter(village__icontains=village.split('(')[1].upper().strip(), district__district_code=data[4])
-                                else:
-                                    obj = Village.objects.filter(village__icontains=village.upper().strip(), district__district_code=data[4])
+                                    obj = Village.objects.filter(village_subcode=village.split('(')[1].upper().strip(), district__district_code=data[4].strip())
+                                if len(obj) < 1:
+                                    obj = Village.objects.filter(village=village.upper().strip(), district__district_code=data[4])
                                 if(len(obj) == 1):
                                     arr.append(int(obj[0].id))
                             print(arr)
