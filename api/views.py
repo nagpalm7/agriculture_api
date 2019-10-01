@@ -493,7 +493,7 @@ class LocationDistrictWiseViewSet(viewsets.ReadOnlyModelViewSet):
     # Making endpoint searchable
     filter_backends = (filters.SearchFilter, )
     search_fields = ('state', 'block_name', 'village_name', 'ado__name', 'status', 'district',)
-    
+
     def get_queryset(self):
         try:
             district = District.objects.get(id=self.kwargs['pk'])
@@ -536,7 +536,7 @@ class VillagesDistrictWiseViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
     filter_backends = (filters.SearchFilter, )
-    search_fields = ('village')
+    search_fields = ('village',)
 
     def get_queryset(self):
         try:
