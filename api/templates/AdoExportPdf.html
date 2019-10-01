@@ -3,25 +3,26 @@
 <html>
 
 <body>
-	<table>
-			<thead >
-				<th>Sno.</th>
-				<th>name</th>
-				<th>email</th>
-				<th>number</th>
+	<table style="border: 1px solid black; width: 100%; word-wrap:break-word;
+              table-layout: fixed;">
+			<thead style = "padding: 10px">
+				<th>SNO.</th>
+				<th>NAME</th>
+				<th>EMAIL</th>
+				<th>NUMBER</th>
 				<th>DDA ASSIGNED</th>
-				<th>Villages</th>
+				<th>VILLAGES</th>
 
 			</thead>
 	{% for object in objects %}
-		<tr style = "margin-bottom:5%;">
-			<td>{{object.id}}</td>
+		<tr style = "margin-bottom:5%;padding: 6px">
+			<td style="width: 30px; text-align:'center'">{{object.id}}</td>
 			<td>{{object.name}}</td>
-			<td>{{object.email}}</td>
-			<td>{{object.number}}</td>
-			<td>{{object.dda.name}}</td>
+			<td style="word-wrap:break-word;">{{object.email}}</td>
+			<td style="width: 100px">{{object.number}}</td>
+			<td>{{object.dda.name}} ( {{object.dda.district.district}} )</td>
 			<td>{% for village in object.village.all %}
-					{{village.village}}
+					{{village.village}}<br>
 				{% endfor %}
 			</td>
 		</tr>
