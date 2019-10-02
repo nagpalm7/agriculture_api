@@ -446,7 +446,7 @@ class LocationViewSetAdoForAdmin(viewsets.ReadOnlyModelViewSet):
     # Making endpoint searchable
     filter_backends = (filters.SearchFilter, )
     search_fields = ('state', 'block_name', 'village_name', 'ado__name', 'status', 'district',)
-    
+
     def get_queryset(self):
         try:
             user = Ado.objects.get(id=self.kwargs['pk'])
@@ -547,7 +547,7 @@ class VillagesDistrictWiseViewSet(viewsets.ReadOnlyModelViewSet):
             district = District.objects.get(id=self.kwargs['pk'])
         except District.DoesNotExist:
             raise Http404
-        villages = Village.objects.filter(district = district)
+        villages = Village.objects.filter(district = district).order_by('village')
         return villages
 
 # ADO reports Views
