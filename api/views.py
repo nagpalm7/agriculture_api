@@ -376,14 +376,14 @@ class AdoViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
     filter_backends = (filters.SearchFilter, )
-    search_fields = ('district__district', 'village__village', 'number', 'name', 'email', 'dda__name',)
+    search_fields = ('dda__district__district', 'village__village', 'number', 'name', 'email', 'dda__name',)
 
     def get_queryset(self):
         try:
             dda = Dda.objects.get(auth_user=self.request.user.pk)
         except Dda.DoesNotExist:
             raise Http404
-        ados = Ado.objects.filter(dda = dda).order_by('ado__name')
+        ados = Ado.objects.filter(dda = dda).order_by('name')
         return ados
 
 # Upload CSV
@@ -445,8 +445,8 @@ class LocationViewSetAdoForAdmin(viewsets.ReadOnlyModelViewSet):
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
     filter_backends = (filters.SearchFilter, )
-    search_fields = ('centre__location', 'course__title', 'first_name', 'last_name', '=contact_number', 'user__email')
-
+    search_fields = ('state', 'block_name', 'village_name', 'ado__name', 'status', 'district',)
+    
     def get_queryset(self):
         try:
             user = Ado.objects.get(id=self.kwargs['pk'])
