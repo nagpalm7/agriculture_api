@@ -640,12 +640,10 @@ class BulkAddVillage(APIView):
                 villages.pop(0);
 
                 for data in villages:
-                    print(data)
                     data = data.split(',')
                     village = []
                     village = data[0].split('(')
                     request.data['village']  = village[0].strip()
-                    print(len(village) > 1)
                     if len(village) > 1:
                         request.data['village_subcode'] = village[1].split(')')[0].strip()
                     else:
@@ -796,12 +794,12 @@ class BulkAddAdo(APIView):
                     request.data['name']  = data[0]
                     request.data['number'] = data[2]
                     request.data['email'] = data[3]
-
+                    dda = None
                     try:
-                        dda = Dda.objects.get(district__district_code=data[4].strip())
+                        dda = Dda.objects.get(district__district_code=data[4].rstrip())
                     except Dda.DoesNotExist:
                         pass
-                    if dda:
+                    if dda != None:
                         request.data['dda'] = dda.id
                     existing = [user['username'] for user in User.objects.values('username')]
                     username = data[5].rstrip()
@@ -832,12 +830,10 @@ class BulkAddAdo(APIView):
                             villages = []
                             villages = data[1].split('|')
                             for village in villages:
-                                # TODO:-
-                                # REMOVE DATA , ADD EXTRA FIELD, ADD 
                                 if len(village.split('(')) > 1:
                                     obj = Village.objects.filter(village_subcode=village.split('(')[1].split(')')[0].upper().strip(), district__district_code=data[4].rstrip())
-                                if len(obj) < 1:
-                                    obj = Village.objects.filter(village=village.upper().strip(), district__district_code=data[4].rstrip())
+                                if len(obj) != 1:
+                                    obj = Village.objects.filter(village=village.split('(')[0].upper().strip(), district__district_code=data[4].rstrip())
                                 if(len(obj) == 1):
                                     arr.append(int(obj[0].id))
                             ado.village.set(arr)
