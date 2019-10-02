@@ -251,7 +251,7 @@ class AdosViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ( 'name', 'number', 'email', 'dda__district__district', 'village__village',)
 
     def get_queryset(self):
-        ados = Ado.objects.all().order_by('-pk')
+        ados = Ado.objects.all().order_by('district__district', 'name')
         return ados
 
 # Details of particular location and edit location in order to set ado
@@ -383,7 +383,7 @@ class AdoViewSet(viewsets.ReadOnlyModelViewSet):
             dda = Dda.objects.get(auth_user=self.request.user.pk)
         except Dda.DoesNotExist:
             raise Http404
-        ados = Ado.objects.filter(dda = dda).order_by('dda__district__district')
+        ados = Ado.objects.filter(dda = dda).order_by('ado__name')
         return ados
 
 # Upload CSV
