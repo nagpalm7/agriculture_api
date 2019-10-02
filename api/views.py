@@ -251,7 +251,7 @@ class AdosViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ( 'name', 'number', 'email', 'dda__district__district', 'village__village',)
 
     def get_queryset(self):
-        ados = Ado.objects.all().order_by('district__district', 'name')
+        ados = Ado.objects.all().order_by('dda__district__district', 'name')
         return ados
 
 # Details of particular location and edit location in order to set ado
