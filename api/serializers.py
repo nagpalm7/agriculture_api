@@ -84,6 +84,15 @@ class AdoSerializer(serializers.ModelSerializer):
         model = Ado
         fields = '__all__'
 
+class DCSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DC
+        fields = '__all__'
+
+class SPSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SP
+        fields = '__all__'
 
 class LocationSerializer(serializers.ModelSerializer):
     ado = AdoSerializer()

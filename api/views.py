@@ -7,17 +7,29 @@ from .models import *
 from .serializers import *
 from .permissions import *
 from .paginators import *
+from django.core.mail import send_mail, EmailMessage
 import datetime
-from agriculture.settings import MEDIA_ROOT, DOMAIN
+from agriculture.settings import MEDIA_ROOT, DOMAIN, EMAIL_HOST_USER
 from django.core.files.storage import FileSystemStorage
 import os
 from django.db.models import Q
 import http.client
 import uuid
 
+from io import BytesIO
 from django.http import HttpResponse
-
+from django.template.loader import get_template
+import xhtml2pdf.pisa as pisa
 from easy_pdf.rendering import render_to_pdf
+
+# Helper function to send email
+def send_email(subject, content, recipient_list, path=None):
+    email_from = EMAIL_HOST_USER
+    mail = EmailMessage(subject, content, email_from, recipient_list)
+    mail.content_subtype = 'html'
+    if path:
+        mail.attach_file(path)
+    mail.send()
 
 class UserList(APIView):
     permission_classes = []
@@ -195,7 +207,6 @@ class VillageDetail(APIView):
 
     def get(self, request, pk, format = None):
         village = self.get_object(pk)
-        data = Village.objects.get(pk=pk)
         serializer = VillageSerializer(data)         
         return Response(serializer.data)
 
@@ -210,6 +221,87 @@ class VillageDetail(APIView):
     def delete(self, request, pk, format = None):
         village = self.get_object(pk)
         village.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+# DC Views
+class DCList(APIView):
+    permission_classes = []
+    def get(self, request, format = None):
+        dcs = DC.objects.all().order_by('name')
+        serializer = DCSerializer(dcs, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format = None):
+        serializer = DCSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class DCDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return DC.objects.get(pk=pk)
+        except DC.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format = None):
+        dc = self.get_object(pk)
+        serializer = DCSerializer(dc)         
+        return Response(serializer.data)
+
+    def put(self, request, pk, format = None):
+        dc = self.get_object(pk)
+        serializer = DCSerializer(dc, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format = None):
+        dc = self.get_object(pk)
+        dc.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+# SP VIEWS
+class SPList(APIView):
+    permission_classes = []
+    def get(self, request, format = None):
+        sps = SP.objects.all().order_by('name')
+        serializer = SPSerializer(sps, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format = None):
+        serializer = SPSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# SP VIEWS
+class SPDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return SP.objects.get(pk=pk)
+        except SP.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format = None):
+        sp = self.get_object(pk)
+        serializer = SPSerializer(sp)         
+        return Response(serializer.data)
+
+    def put(self, request, pk, format = None):
+        sp = self.get_object(pk)
+        serializer = SPSerializer(sp, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format = None):
+        sp = self.get_object(pk)
+        sp.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 # Shows list of Admins
@@ -399,16 +491,21 @@ class LocationList(APIView):
         count = 0
         if 'location_csv' in request.data:
             if not request.data['location_csv'].name.endswith('.csv'):
-                return Response({'location_csv': ['Please upload a valid document ending with .csv']},
+                return Response({'location_csv': ['Please upload a valid document ending with .xlsx or xls']},
                     status = HTTP_400_BAD_REQUEST)
             fs = FileSystemStorage()
             fs.save(directory + request.data['location_csv'].name, request.data['location_csv'])
+            # file = pd.read_excel(directory + request.data['location_csv'].name, sheetname="Sheet1")
+
             csvFile = open(directory + request.data['location_csv'].name, 'r')
             for line in csvFile.readlines():
                 locations.append(line)
             
             locations.pop(0);
-
+            MAILING_LIST = {}
+            directory = MEDIA_ROOT + '/mailing/'
+            if not os.path.exists(directory):
+                os.makedirs(directory)
             for data in locations:
                 data = data.split(',')
                 request.data['state']  = data[0]
@@ -433,8 +530,43 @@ class LocationList(APIView):
                 if serializer.is_valid():
                     serializer.save()
                     count = count + 1;
+                    # Send the mail to DC
+                    mail_data = {}
+                    district = data[1].rstrip().upper()
+                    del data[0]
+                    owners = data[9].split('|')
+                    del data[9]
+                    print(data)
+                    mail_data = {
+                        'data':data,
+                        'owners': owners
+                    }
+                    print(owners)
+                    # content = render_to_pdf('mail_dc.html',mail_data, encoding = 'utf-8')
+                    # with open(directory + 'mail_pdf.pdf', 'wb') as f:
+                    #     f.write(content)
+
+                    template = get_template('mail_dc.html')
+                    html = template.render(mail_data)
+                    file_name = "mail_pdf.pdf"
+                    file_path = directory + file_name
+                    with open(file_path, 'wb') as pdf:
+                        pisa.pisaDocument(BytesIO(html.encode("UTF-8")), pdf)
+
+                    # Send mail to DC
+                    subject = "Report For Active Fire Locations"
+                    content = """
+                        PFA
+                    """
+                    email = ['nagpalm7@gmail.com']
+                    send_email(subject, content, email, directory + 'mail_pdf.pdf')   # Send mail
+            # Send mail to SP
+            # subject = "Report For Active Fire Locations"
+            # content = """
+            # """
+            # email = ['akash.akashdeepsharma@gmail.com', 'nagpalm7@gmail.com']
+            # send_email(subject, content, email)   # Send mail
             return Response({'status': 'success', 'count': count}, status=status.HTTP_201_CREATED)
-        print("error", request.data.location_csv)
         return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
 # Shows list of locations for specific ado for admin
