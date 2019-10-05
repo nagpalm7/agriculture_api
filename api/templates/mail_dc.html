@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+	   <meta http-equiv="content-type" content="text/html; charset=utf-8">
+	   <style type="text/css">
+	   		@font-face { font-family: Hindi; src: url(/static/pdf.ttf); }
+			body {
+			    font-family: Hindi, Arial, 'sans-serif';
+			    color: #333333;
+			}
+	   		@page {
+	            size: A4;
+	            margin: 1cm;
+	        }
+	        .table {
+	            width: 100%;
+	            max-width: 100%;
+	            margin-bottom: 5px;
+	            background-color: #fff;
+	        }
+	        .table th,
+	        .table td {
+	            padding: 5px;
+	            vertical-align: top;
+	            border-top: 1px solid #000;
+	            text-align: center;
+	        }
+	        .table thead th {
+	            vertical-align: bottom;
+	            border-bottom: 2px solid #000;
+	        }
+	        .table tbody + tbody {
+	            border-top: 2px solid #000;
+	        }
+	        .table .table {
+	            background-color: #fff;
+	        }
+
+	   </style>
+</head>
+<body style="padding:20px">
+	<center>
+		<h1>Department of Agriculture and Farmers Welfare Haryana</h1>
+	</center>
+	<div style="display:block; margin-top: 8px">
+		<div style="display: inline-block">
+			Serial No. 006
+		</div>
+		<div style="display: inline-block; text-align:right">
+			Date 03 / 19 / 2019
+		</div>
+	</div>
+	<p style="margin-top:8px">Given Information is provided by HARSAC about the detected Active Fire Location:</p>
+	<table class="table">
+		<thead>
+			<th>District</th>
+			<th>Block Name</th>
+			<th>Village Name</th>
+			<th>Longitude</th>
+			<th>Latitude</th>
+			<th>Acq_Date</th>
+			<th>Acq_Time</th>
+			<th>Murraba No.</th>
+			<th>Kila no.</th>
+		</thead>
+		<tr>
+			{% for x in data %}
+				<td>{{x}}</td>
+			{% endfor %}
+		</tr>
+	</table>
+	<p>According to the provided latitude and longitude, the list of the owners is given below :</p>
+	<div style="border:1px solid black; padding:8px">
+		{% for x in owners %}
+			{{x}}
+		{% endfor %}
+	</div>
+	
+	<p>You are advised to act accordingly, and immediately.</p>
+	<div style="text-align: right">
+		<strong>Department of Agriculture and Farmers Welfare, Haryana</strong>
+	</div>
+</body>
+</html>
