@@ -519,12 +519,16 @@ class LocationList(APIView):
                 # request.data['csv_file'] = MEDIA_ROOT + 'locationCSVs/' + request.data['location_csv'].name
                 dda = []
                 dda = Dda.objects.filter(district__district=data[1].rstrip().upper())
-                if(len(dda)>=1):
+                if(len(dda)==1):
                     request.data['dda'] = dda[0].pk
+                else:
+                    request.data['dda'] = None
                 ado = []
-                ado = Ado.objects.filter(village__village__icontains=data[3].rstrip().upper())
-                if len(ado)>=1:
+                ado = Ado.objects.filter(village__village=data[3].rstrip().upper(), dda__district__district=data[1].rstrip().upper())
+                if len(ado)==1:
                     request.data['ado'] = ado[0].pk
+                else:
+                    request.data['ado'] = None
                 # print("dda", request.data['csv_file'])
                 serializer = AddLocationSerializer(data=request.data)
                 if serializer.is_valid():
@@ -999,7 +1003,7 @@ class GetListAdo(APIView):
         filename = 'list.csv'
         csvFile = open(directory + filename, 'w')
         csvFile.write('Name,Email,Number, DDA, Villages\n')
-        ados = Ado.objects.all()
+        ados = Ado.objects.all().order_by('dda__district__district', 'name')
         for ado in ados:
             name = ado.name
             email = ado.email
@@ -1015,7 +1019,6 @@ class GetListAdo(APIView):
             objects = ado.village.all()
             for village in objects:
                 villages.append(village.village)
-            print(villages)
             villages = '|'.join(villages)
             csvFile.write(name + ',' + email + ',' + number + ',' + dda + ',' + villages + '\n')
         csvFile.close()
