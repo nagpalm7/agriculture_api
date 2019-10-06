@@ -871,7 +871,7 @@ class GetListAdo(APIView):
         filename = 'list.csv'
         csvFile = open(directory + filename, 'w')
         csvFile.write('Name,Email,Number, DDA, Villages\n')
-        ados = Ado.objects.all()
+        ados = Ado.objects.all().order_by('dda__district__district', 'name')
         for ado in ados:
             name = ado.name
             email = ado.email
@@ -887,7 +887,6 @@ class GetListAdo(APIView):
             objects = ado.village.all()
             for village in objects:
                 villages.append(village.village)
-            print(villages)
             villages = '|'.join(villages)
             csvFile.write(name + ',' + email + ',' + number + ',' + dda + ',' + villages + '\n')
         csvFile.close()
