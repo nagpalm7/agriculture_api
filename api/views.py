@@ -422,11 +422,11 @@ class LocationList(APIView):
                 # request.data['csv_file'] = MEDIA_ROOT + 'locationCSVs/' + request.data['location_csv'].name
                 dda = []
                 dda = Dda.objects.filter(district__district=data[1].rstrip().upper())
-                if(len(dda)>=1):
+                if(len(dda)==1):
                     request.data['dda'] = dda[0].pk
                 ado = []
                 ado = Ado.objects.filter(village__village=data[3].rstrip().upper(), dda__district__district=data[1].rstrip().upper())
-                if len(ado)>=1:
+                if len(ado)==1:
                     request.data['ado'] = ado[0].pk
                 # print("dda", request.data['csv_file'])
                 serializer = AddLocationSerializer(data=request.data)
