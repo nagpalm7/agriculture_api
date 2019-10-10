@@ -507,6 +507,7 @@ class LocationList(APIView):
             if not os.path.exists(directory):
                 os.makedirs(directory)
             for data in locations:
+                index = locations.index(data)
                 data = data.split(',')
                 request.data['state']  = data[0]
                 request.data['district'] = data[1]
@@ -534,42 +535,70 @@ class LocationList(APIView):
                 if serializer.is_valid():
                     serializer.save()
                     count = count + 1;
-                    # Send the mail to DC
-                    mail_data = {}
-                    district = data[1].rstrip().upper()
-                    del data[0]
-                    owners = data[9].split('|')
-                    del data[9]
-                    print(data)
-                    mail_data = {
-                        'data':data,
-                        'owners': owners
-                    }
-                    print(owners)
-                    # content = render_to_pdf('mail_dc.html',mail_data, encoding = 'utf-8')
-                    # with open(directory + 'mail_pdf.pdf', 'wb') as f:
-                    #     f.write(content)
+            return Response({'status': 'success', 'count': count}, status=status.HTTP_201_CREATED)
+        return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
-                    template = get_template('mail_dc.html')
-                    html = template.render(mail_data)
-                    file_name = "mail_pdf.pdf"
-                    file_path = directory + file_name
-                    with open(file_path, 'wb') as pdf:
-                        pisa.pisaDocument(BytesIO(html.encode("UTF-8")), pdf)
+# Upload CSV for FIR
+class MailView(APIView):
+    permission_classes = []
 
-                    # Send mail to DC
-                    subject = "Report For Active Fire Locations"
-                    content = """
-                        PFA
-                    """
-                    email = ['nagpalm7@gmail.com']
-                    send_email(subject, content, email, directory + 'mail_pdf.pdf')   # Send mail
-            # Send mail to SP
-            # subject = "Report For Active Fire Locations"
-            # content = """
-            # """
-            # email = ['akash.akashdeepsharma@gmail.com', 'nagpalm7@gmail.com']
-            # send_email(subject, content, email)   # Send mail
+    def post(self, request, format = None):
+        directory = MEDIA_ROOT + '/FIR/'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        locations = []
+        count = 0
+        if 'location_csv' in request.data:
+            if not request.data['location_csv'].name.endswith('.csv'):
+                return Response({'location_csv': ['Please upload a valid document ending with .xlsx or xls']},
+                    status = HTTP_400_BAD_REQUEST)
+            fs = FileSystemStorage()
+            fs.save(directory + request.data['location_csv'].name, request.data['location_csv'])
+            # file = pd.read_excel(directory + request.data['location_csv'].name, sheetname="Sheet1")
+
+            csvFile = open(directory + request.data['location_csv'].name, 'r')
+            for line in csvFile.readlines():
+                locations.append(line)
+            
+            locations.pop(0);
+            MAILING_LIST = {}
+            directory = MEDIA_ROOT + '/mailing/'
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            mail_data = {}
+            for data in locations:
+                index = locations.index(data)
+                data = data.split(',')
+                del data[0]
+                owners = str(data[9]).rstrip().split('|')
+                data[9] = owners
+                # Create mail data district wise
+                count += 1
+                district = data[0].rstrip().upper()
+                if str(district) in mail_data:
+                    mail_data[str(district)].append(data)
+                else:
+                    mail_data[str(district)] = []
+                    mail_data[str(district)].append(data)
+            print(mail_data)
+            for mail in mail_data:
+                district_mail_data = {
+                    'data': mail_data[str(mail)],
+                    'date': str(datetime.date.today().strftime("%d / %m / %Y")),
+                    'sno': '00' + str(index + 1)
+                }
+                content = render_to_pdf('mail_dc.html',district_mail_data, encoding = 'utf-8')
+                with open(directory + 'mail_pdf.pdf', 'wb') as f:
+                    f.write(content)
+
+                # Send mail to DC
+                subject = "Report For Active Fire Locations"
+                content = """
+                    PFA
+                """
+                email = ['nagpalm7@gmail.com', 'akash.akashdeepsharma@gmail.com']
+                send_email(subject, content, email, directory + 'mail_pdf.pdf')   # Send mail
             return Response({'status': 'success', 'count': count}, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
 

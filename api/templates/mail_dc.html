@@ -8,10 +8,15 @@
 			body {
 			    font-family: Hindi, Arial, 'sans-serif';
 			    color: #333333;
+			    line-height: 1.0em;
 			}
 	   		@page {
 	            size: A4;
 	            margin: 1cm;
+	            size: landscape;
+	        }
+	        strong{
+	        	font-weight: bolder;
 	        }
 	        .table {
 	            width: 100%;
@@ -43,13 +48,11 @@
 	<center>
 		<h1>Department of Agriculture and Farmers Welfare Haryana</h1>
 	</center>
-	<div style="display:block; margin-top: 8px">
-		<div style="display: inline-block">
-			Serial No. 006
-		</div>
-		<div style="display: inline-block; text-align:right">
-			Date 03 / 19 / 2019
-		</div>
+	<div>
+		Serial No. {{sno}}
+	</div>
+	<div>
+		Date {{date}}
 	</div>
 	<p style="margin-top:8px">Given Information is provided by HARSAC about the detected Active Fire Location:</p>
 	<table class="table">
@@ -63,23 +66,30 @@
 			<th>Acq_Time</th>
 			<th>Murraba No.</th>
 			<th>Kila no.</th>
+			<th>Owners</th>
 		</thead>
-		<tr>
-			{% for x in data %}
-				<td>{{x}}</td>
-			{% endfor %}
-		</tr>
-	</table>
-	<p>According to the provided latitude and longitude, the list of the owners is given below :</p>
-	<div style="border:1px solid black; padding:8px">
-		{% for x in owners %}
-			{{x}}
+		{% for row in data %}
+			<tr>
+				{% for x in row %}
+					<td>
+						{% if forloop.last %}
+					        {% for owner in x %}
+					        	{{owner}}
+					        	{% if not forloop.last %}
+					        		<br><hr>
+					        	{% endif %}
+					        {% endfor %}
+					    {% else %}
+					        {{ x }}
+					    {% endif %}
+					</td>
+				{% endfor %}
+			</tr>
 		{% endfor %}
-	</div>
-	
-	<p>You are advised to act accordingly, and immediately.</p>
+	</table>
+	<b><p>You are advised to act accordingly, and immediately.</p></b>
 	<div style="text-align: right">
-		<strong>Department of Agriculture and Farmers Welfare, Haryana</strong>
+		<b>Department of Agriculture and Farmers Welfare, Haryana</b>
 	</div>
 </body>
 </html>
