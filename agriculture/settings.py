@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'easy_pdf',
+    'django_filters'
 ]
 
 MIDDLEWARE = [
@@ -132,6 +133,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',  # <-- And here
     ],
+
 }
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 1002000 # higher than the count of fields
