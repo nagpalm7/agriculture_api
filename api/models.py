@@ -177,3 +177,18 @@ class AdoReport(models.Model):
 class Image(models.Model):
     report = models.ForeignKey(AdoReport, on_delete = models.CASCADE)
     image = models.ImageField(upload_to='images/')
+
+class DC(models.Model):
+    name = models.CharField(max_length=200, blank=True, null=True)
+    email = models.CharField(max_length=100, blank=True, null=True)
+    district = models.ForeignKey(District, on_delete = models.CASCADE, blank = True, null = True, related_name='dc_district')
+
+    def __str__(self):
+        return str(self.name)
+
+class SP(models.Model):
+    name = models.CharField(max_length=200, blank=True, null=True)
+    email = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return str(self.name)

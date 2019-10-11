@@ -7,17 +7,31 @@ from .models import *
 from .serializers import *
 from .permissions import *
 from .paginators import *
+from django.core.mail import send_mail, EmailMessage
 import datetime
-from agriculture.settings import MEDIA_ROOT, DOMAIN
+from agriculture.settings import MEDIA_ROOT, DOMAIN, EMAIL_HOST_USER
 from django.core.files.storage import FileSystemStorage
 import os
 from django.db.models import Q
 import http.client
 import uuid
+import xlrd
+
+from io import BytesIO
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import HttpResponse
-
+from django.template.loader import get_template
+import xhtml2pdf.pisa as pisa
 from easy_pdf.rendering import render_to_pdf
+
+# Helper function to send email
+def send_email(subject, content, recipient_list, path=None):
+    email_from = EMAIL_HOST_USER
+    mail = EmailMessage(subject, content, email_from, recipient_list)
+    mail.content_subtype = 'html'
+    if path:
+        mail.attach_file(path)
+    mail.send()
 
 class UserList(APIView):
     permission_classes = []
@@ -196,7 +210,6 @@ class VillageDetail(APIView):
 
     def get(self, request, pk, format = None):
         village = self.get_object(pk)
-        data = Village.objects.get(pk=pk)
         serializer = VillageSerializer(data)         
         return Response(serializer.data)
 
@@ -211,6 +224,87 @@ class VillageDetail(APIView):
     def delete(self, request, pk, format = None):
         village = self.get_object(pk)
         village.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+# DC Views
+class DCList(APIView):
+    permission_classes = []
+    def get(self, request, format = None):
+        dcs = DC.objects.all().order_by('name')
+        serializer = DCSerializer(dcs, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format = None):
+        serializer = DCSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class DCDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return DC.objects.get(pk=pk)
+        except DC.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format = None):
+        dc = self.get_object(pk)
+        serializer = DCSerializer(dc)         
+        return Response(serializer.data)
+
+    def put(self, request, pk, format = None):
+        dc = self.get_object(pk)
+        serializer = DCSerializer(dc, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format = None):
+        dc = self.get_object(pk)
+        dc.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+# SP VIEWS
+class SPList(APIView):
+    permission_classes = []
+    def get(self, request, format = None):
+        sps = SP.objects.all().order_by('name')
+        serializer = SPSerializer(sps, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format = None):
+        serializer = SPSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# SP VIEWS
+class SPDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return SP.objects.get(pk=pk)
+        except SP.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format = None):
+        sp = self.get_object(pk)
+        serializer = SPSerializer(sp)         
+        return Response(serializer.data)
+
+    def put(self, request, pk, format = None):
+        sp = self.get_object(pk)
+        serializer = SPSerializer(sp, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format = None):
+        sp = self.get_object(pk)
+        sp.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 # Shows list of Admins
@@ -403,17 +497,23 @@ class LocationList(APIView):
         count = 0
         if 'location_csv' in request.data:
             if not request.data['location_csv'].name.endswith('.csv'):
-                return Response({'location_csv': ['Please upload a valid document ending with .csv']},
+                return Response({'location_csv': ['Please upload a valid document ending with .xlsx or xls']},
                     status = HTTP_400_BAD_REQUEST)
             fs = FileSystemStorage()
             fs.save(directory + request.data['location_csv'].name, request.data['location_csv'])
+            # file = pd.read_excel(directory + request.data['location_csv'].name, sheetname="Sheet1")
+
             csvFile = open(directory + request.data['location_csv'].name, 'r')
             for line in csvFile.readlines():
                 locations.append(line)
             
             locations.pop(0);
-
+            MAILING_LIST = {}
+            directory = MEDIA_ROOT + '/mailing/'
+            if not os.path.exists(directory):
+                os.makedirs(directory)
             for data in locations:
+                index = locations.index(data)
                 data = data.split(',')
                 request.data['state']  = data[0]
                 request.data['district'] = data[1]
@@ -442,7 +542,70 @@ class LocationList(APIView):
                     serializer.save()
                     count = count + 1;
             return Response({'status': 'success', 'count': count}, status=status.HTTP_201_CREATED)
-        print("error", request.data.location_csv)
+        return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
+# Upload CSV for FIR
+class MailView(APIView):
+    permission_classes = []
+
+    def post(self, request, format = None):
+        directory = MEDIA_ROOT + '/FIR/'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        locations = []
+        count = 0
+        if 'location_csv' in request.data:
+            if not request.data['location_csv'].name.endswith('.xlsx') or request.data['location_csv'].name.endswith('.xls'):
+                return Response({'location_csv': ['Please upload a valid document ending with .xlsx or xls']},
+                    status = HTTP_400_BAD_REQUEST)
+            fs = FileSystemStorage()
+            fs.save(directory + request.data['location_csv'].name, request.data['location_csv'])
+            wb = xlrd.open_workbook(directory + request.data['location_csv'].name) 
+            sheet = wb.sheet_by_index(0) 
+            rows = sheet.nrows
+            locations = []
+            for index in range(rows):
+                locations.append(sheet.row_values(index))
+
+            locations.pop(0);
+            MAILING_LIST = {}
+            directory = MEDIA_ROOT + '/mailing/'
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            mail_data = {}
+            for data in locations:
+                del data[0]
+                owners = str(data[9]).rstrip().split(',')
+                data[9] = owners
+                # Create mail data district wise
+                count += 1
+                district = data[0].rstrip().upper()
+                if str(district) in mail_data:
+                    mail_data[str(district)].append(data)
+                else:
+                    mail_data[str(district)] = []
+                    mail_data[str(district)].append(data)
+            index = -1
+            for mail in mail_data:
+                index += 1
+                district_mail_data = {
+                    'data': mail_data[str(mail)],
+                    'date': str(datetime.date.today().strftime("%d / %m / %Y")),
+                    'sno': '00' + str(index + 1)
+                }
+                content = render_to_pdf('mail_dc.html',district_mail_data, encoding = 'utf-8')
+                with open(directory + 'mail_pdf.pdf', 'wb') as f:
+                    f.write(content)
+
+                # Send mail to DC
+                subject = "Report For Active Fire Locations"
+                content = """
+                    PFA
+                """
+                email = ['akash.akashdeepsharam@gmail.com']
+                send_email(subject, content, email, directory + 'mail_pdf.pdf')   # Send mail
+            return Response({'status': 'success', 'count': index}, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
 # Shows list of locations for specific ado for admin
