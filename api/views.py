@@ -18,6 +18,7 @@ import uuid
 import xlrd
 
 from io import BytesIO
+from django_filters.rest_framework import DjangoFilterBackend
 from django.http import HttpResponse
 from django.template.loader import get_template
 import xhtml2pdf.pisa as pisa
@@ -178,8 +179,9 @@ class VillageViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, )
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
-    filter_backends = (filters.SearchFilter, )
-    search_fields = ('village', 'village_code',)
+    filter_backends = (filters.SearchFilter, DjangoFilterBackend, )
+    search_fields = ('village', 'village_code', 'district__district',)
+    filterset_fields = ['district']
 
     def get_queryset(self):
         villages = Village.objects.all().order_by('-pk')
@@ -340,9 +342,9 @@ class AdosViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, )
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
-    filter_backends = (filters.SearchFilter, )
+    filter_backends = (filters.SearchFilter, DjangoFilterBackend, )
     search_fields = ( 'name', 'number', 'email', 'dda__district__district', 'village__village',)
-
+    filterset_fields = [ 'dda' ]
     def get_queryset(self):
         ados = Ado.objects.all().order_by('dda__district__district', 'name')
         return ados
@@ -398,7 +400,8 @@ class LocationViewSet(viewsets.ReadOnlyModelViewSet):
     # permission_classes = (permissions.IsAuthenticated, IsSuperadmin, )
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
-    filter_backends = (filters.SearchFilter, )
+    filter_backends = (filters.SearchFilter, DjangoFilterBackend, )
+    filterset_fields = [ 'dda', 'ado', 'status']
     search_fields = ('state', 'block_name', 'village_name', 'dda__name', 'ado__name', 'status', 'district',)
 
     def get_queryset(self):
@@ -441,7 +444,8 @@ class LocationViewSetDda(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, )
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
-    filter_backends = (filters.SearchFilter, )
+    filter_backends = (filters.SearchFilter, DjangoFilterBackend, )
+    filterset_fields = [ 'ado', 'status']
     search_fields = ('state', 'block_name', 'village_name', 'ado__name', 'status', 'district',)
 
     def get_queryset(self):
@@ -468,7 +472,8 @@ class AdoViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, )
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
-    filter_backends = (filters.SearchFilter, )
+    filter_backends = (filters.SearchFilter, DjangoFilterBackend, )
+    filterset_fields = [ 'dda']
     search_fields = ('dda__district__district', 'village__village', 'number', 'name', 'email', 'dda__name',)
 
     def get_queryset(self):
@@ -610,7 +615,8 @@ class LocationViewSetAdoForAdmin(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, )
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
-    filter_backends = (filters.SearchFilter, )
+    filter_backends = (filters.SearchFilter, DjangoFilterBackend, )
+    filterset_fields = [ 'dda', 'ado', 'status']
     search_fields = ('state', 'block_name', 'village_name', 'ado__name', 'status', 'district',)
 
     def get_queryset(self):
@@ -633,7 +639,8 @@ class LocationViewSetDdaForAdmin(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, )
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
-    filter_backends = (filters.SearchFilter, )
+    filter_backends = (filters.SearchFilter, DjangoFilterBackend, )
+    filterset_fields = [ 'dda', 'ado', 'status']
     search_fields = ('state', 'block_name', 'village_name', 'ado__name', 'status', 'district',)
 
     def get_queryset(self):
@@ -654,7 +661,6 @@ class LocationViewSetDdaForAdmin(viewsets.ReadOnlyModelViewSet):
         return locations
 
 # Location district wise
-# Shows list of Ados
 class LocationDistrictWiseViewSet(viewsets.ReadOnlyModelViewSet):
     model = Location
     serializer_class = LocationSerializer
@@ -818,6 +824,8 @@ class BulkAddVillage(APIView):
                     district = District.objects.filter(district_code=data[2].rstrip())
                     if len(district) == 1:
                         request.data['district'] = district[0].id
+                    else:
+                        request.data['district'] = None
                     del village
                     serializer = VillageSerializer(data=request.data)
                     if serializer.is_valid():
