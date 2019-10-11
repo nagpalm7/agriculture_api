@@ -661,7 +661,7 @@ class BulkAddVillage(APIView):
                     district = District.objects.filter(district_code=data[2].rstrip())
                     if len(district) == 1:
                         request.data['district'] = district[0].id
-                    else
+                    else:
                         request.data['district'] = None
                     del village
                     serializer = VillageSerializer(data=request.data)
