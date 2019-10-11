@@ -570,7 +570,6 @@ class MailView(APIView):
                 os.makedirs(directory)
             mail_data = {}
             for data in locations:
-                index = locations.index(data)
                 del data[0]
                 owners = str(data[9]).rstrip().split(',')
                 data[9] = owners
@@ -582,8 +581,9 @@ class MailView(APIView):
                 else:
                     mail_data[str(district)] = []
                     mail_data[str(district)].append(data)
-            print(mail_data)
+            index = -1
             for mail in mail_data:
+                index += 1
                 district_mail_data = {
                     'data': mail_data[str(mail)],
                     'date': str(datetime.date.today().strftime("%d / %m / %Y")),
@@ -598,9 +598,9 @@ class MailView(APIView):
                 content = """
                     PFA
                 """
-                email = ['nagpalm7@gmail.com']
+                email = ['akash.akashdeepsharam@gmail.com']
                 send_email(subject, content, email, directory + 'mail_pdf.pdf')   # Send mail
-            return Response({'status': 'success', 'count': count}, status=status.HTTP_201_CREATED)
+            return Response({'status': 'success', 'count': index}, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
 # Shows list of locations for specific ado for admin

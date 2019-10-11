@@ -10,13 +10,17 @@
 			    color: #333333;
 			    line-height: 1.0em;
 			}
+			table { page-break-inside:auto }
+		    tr    { page-break-inside:avoid; page-break-after:auto }
+		    thead { display:table-header-group }
+		    tfoot { display:table-footer-group }
 	   		@page {
 	            size: A4;
 	            margin: 1cm;
 	            size: landscape;
 	        }
-	        strong{
-	        	font-weight: bolder;
+	        b{
+	        	font-weight: 900;
 	        }
 	        .table {
 	            width: 100%;
