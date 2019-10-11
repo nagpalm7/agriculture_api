@@ -15,6 +15,7 @@ import os
 from django.db.models import Q
 import http.client
 import uuid
+import xlrd
 
 from io import BytesIO
 from django.http import HttpResponse
@@ -550,17 +551,18 @@ class MailView(APIView):
         locations = []
         count = 0
         if 'location_csv' in request.data:
-            if not request.data['location_csv'].name.endswith('.csv'):
+            if not request.data['location_csv'].name.endswith('.xlsx') or request.data['location_csv'].name.endswith('.xls'):
                 return Response({'location_csv': ['Please upload a valid document ending with .xlsx or xls']},
                     status = HTTP_400_BAD_REQUEST)
             fs = FileSystemStorage()
             fs.save(directory + request.data['location_csv'].name, request.data['location_csv'])
-            # file = pd.read_excel(directory + request.data['location_csv'].name, sheetname="Sheet1")
+            wb = xlrd.open_workbook(directory + request.data['location_csv'].name) 
+            sheet = wb.sheet_by_index(0) 
+            rows = sheet.nrows
+            locations = []
+            for index in range(rows):
+                locations.append(sheet.row_values(index))
 
-            csvFile = open(directory + request.data['location_csv'].name, 'r')
-            for line in csvFile.readlines():
-                locations.append(line)
-            
             locations.pop(0);
             MAILING_LIST = {}
             directory = MEDIA_ROOT + '/mailing/'
@@ -569,9 +571,8 @@ class MailView(APIView):
             mail_data = {}
             for data in locations:
                 index = locations.index(data)
-                data = data.split(',')
                 del data[0]
-                owners = str(data[9]).rstrip().split('|')
+                owners = str(data[9]).rstrip().split(',')
                 data[9] = owners
                 # Create mail data district wise
                 count += 1
@@ -597,7 +598,7 @@ class MailView(APIView):
                 content = """
                     PFA
                 """
-                email = ['nagpalm7@gmail.com', 'akash.akashdeepsharma@gmail.com']
+                email = ['nagpalm7@gmail.com']
                 send_email(subject, content, email, directory + 'mail_pdf.pdf')   # Send mail
             return Response({'status': 'success', 'count': count}, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
