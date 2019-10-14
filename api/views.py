@@ -589,23 +589,27 @@ class MailView(APIView):
             index = -1
             for mail in mail_data:
                 index += 1
+                new_table = {}
+                owners = []
+                officers_mail_id = DC.objects.filter(district__district = str(mail).upper()).values('email')
+                email = []
+                for email in officers_mail_id:
+                    email.append(email.email)
+                for row in mail_data[str(mail)]:
+                    owners.append(row[9])
+                    ind = mail_data[str(mail)].index(row)
+                    del mail_data[str(mail)][ind][9]
                 table = mail_data[str(mail)]
                 new_table = []
                 for row in table:
-                    owners = row[9]
-                    for owner in owners:
-                        new_row = []
-                        if owners.index(owner) == 0:
-                            for x in range(9):
-                                new_row.append(row[x])
-                        else:
-                            for x in range(9):
-                                new_row.append("      ")
-                        new_row.append(owner)
-                        new_table.append(new_row)
-
+                    obj = {
+                        "data": row,
+                        "owners": owners[table.index(row)]
+                    }
+                    new_table.append(obj)
                 district_mail_data = {
                     'data': new_table,
+                    'owners': owners,
                     'date': str(datetime.date.today().strftime("%d / %m / %Y")),
                     'sno': '00' + str(index + 1)
                 }
@@ -618,7 +622,7 @@ class MailView(APIView):
                 content = """
                     PFA
                 """
-                email = ['nagpalm7@gmail.com', 'akash.akashdeepsharma@gmail.com']
+                email += ['akash.akashdepsharma@gmail.com']
                 send_email(subject, content, email, directory + str(mail) + '.pdf')   # Send mail
             return Response({'status': 'success', 'count': index}, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)

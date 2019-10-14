@@ -9,7 +9,7 @@
 			body {
 			    font-family: Hindi, "Arial Black";
 			    color: #333333;
-			    line-height: 1.0em;
+			    line-height: 4px !important;
 			    font-size: 14px !important;
 			    word-break: break-word;
 			}
@@ -66,54 +66,55 @@
 	   </style>
 </head>
 <body style="padding:20px">
-	<center>
-		<h1>Department of Agriculture and Farmers Welfare Haryana</h1>
-	</center>
-	<div>
-		Serial No. {{sno}}
+	{% for row in data %}
+	<div style="page-break-after: always">
+		<center>
+			<h1>Department of Agriculture and Farmers Welfare Haryana</h1>
+		</center>
+		<div>
+			Serial No. {{sno}}
+		</div>
+		<div>
+			Date {{date}}
+		</div>
+		<p style="margin-top:8px">Given Information is provided by HARSAC about the detected Active Fire Location:</p>
+		<table class="table">
+			<thead>
+				<th id="sno">Sno</th>
+				<th style="min-width:10%; word-break: break-word">District</th>
+				<th style="min-width:10%; word-break: break-word">Block Name</th>
+				<th style="min-width:10%; word-break: break-word">Village Name</th>
+				<th style="min-width:10%; word-break: break-word">Longitude</th>
+				<th style="min-width:10%; word-break: break-word">Latitude</th>
+				<th style="min-width:10%; word-break: break-word">Acq Date</th>
+				<th style="min-width:10%; word-break: break-word">Acq Time</th>
+				<th style="min-width:10%; word-break: break-word">Murraba No.</th>
+				<th style="min-width:10%; word-break: break-word">Kila no.</th>
+			</thead>
+			<tbody>
+					<tr>
+						<td id="sno">{{ forloop.counter }}</td>
+						{% for x in row.data %}
+							<td>{{x}}</td>						
+						{% endfor %}
+					</tr>
+			</tbody>
+		</table>
+		<div class="owners-list">
+			{% if row.owners %}
+			    <h3>List of owners:- </h3>
+			{% endif %}
+			<ul>
+				{% for owner in row.owners %}
+		        	<li>{{owner}}</li>
+		        {% endfor %}
+			</ul>
+		</div>
+		<b><p>You are advised to act accordingly, and immediately.</p></b>
+		<div style="text-align: right">
+			<b>Department of Agriculture and Farmers Welfare, Haryana</b>
+		</div>
 	</div>
-	<div>
-		Date {{date}}
-	</div>
-	<p style="margin-top:8px">Given Information is provided by HARSAC about the detected Active Fire Location:</p>
-	<table class="table">
-		<thead>
-			<!-- <th id="sno">Sno</th> -->
-			<th style="min-width:8%; word-break: break-word" width=300px>District</th>
-			<th style="min-width:8%; word-break: break-word" width=300px>Block Name</th>
-			<th style="min-width:8%; word-break: break-word" width=300px>Village Name</th>
-			<th style="min-width:8%; word-break: break-word" width=300px>Longitude</th>
-			<th style="min-width:8%; word-break: break-word" width=300px>Latitude</th>
-			<th style="min-width:8%; word-break: break-word" width=300px>Acq Date</th>
-			<th style="min-width:8%; word-break: break-word" width=300px>Acq Time</th>
-			<th style="min-width:8%; word-break: break-word" width=300px>Murraba No.</th>
-			<th style="min-width:8%; word-break: break-word" width=300px>Kila no.</th>
-			<th style="min-width:8%; word-break: break-word" width=300px>Owners</th>
-		</thead>
-		<tbody>
-			{% for row in data %}
-				<tr>
-					<!-- <td id="sno">{{ forloop.counter }}</td> -->
-					{% for x in row %}
-						<td>{{x}}</td>
-							<!-- {% if forloop.last %}
-						        {% for owner in x %}
-						        	{{owner}}
-						        	{% if not forloop.last %}
-						        		<br>
-						        	{% endif %}
-						        {% endfor %}
-						    {% else %}
-						        {{ x }}
-						    {% endif %}  -->						
-					{% endfor %}
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
-	<b><p>You are advised to act accordingly, and immediately.</p></b>
-	<div style="text-align: right">
-		<b>Department of Agriculture and Farmers Welfare, Haryana</b>
-	</div>
+	{% endfor %}
 </body>
 </html>
