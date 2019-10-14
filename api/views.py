@@ -576,7 +576,7 @@ class MailView(APIView):
             mail_data = {}
             for data in locations:
                 del data[0]
-                owners = str(data[9]).rstrip().split(',')
+                owners = str(data[9]).rstrip()
                 data[9] = owners
                 # Create mail data district wise
                 count += 1
@@ -593,8 +593,8 @@ class MailView(APIView):
                 owners = []
                 officers_mail_id = DC.objects.filter(district__district = str(mail).upper()).values('email')
                 email = []
-                for email in officers_mail_id:
-                    email.append(email.email)
+                for e in officers_mail_id:
+                    email.append(e['email'])
                 for row in mail_data[str(mail)]:
                     owners.append(row[9])
                     ind = mail_data[str(mail)].index(row)
@@ -609,7 +609,6 @@ class MailView(APIView):
                     new_table.append(obj)
                 district_mail_data = {
                     'data': new_table,
-                    'owners': owners,
                     'date': str(datetime.date.today().strftime("%d / %m / %Y")),
                     'sno': '00' + str(index + 1)
                 }
@@ -622,7 +621,7 @@ class MailView(APIView):
                 content = """
                     PFA
                 """
-                email += ['akash.akashdepsharma@gmail.com']
+                # email += ['akash.akashdepsharma@gmail.com']
                 send_email(subject, content, email, directory + str(mail) + '.pdf')   # Send mail
             return Response({'status': 'success', 'count': index}, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
