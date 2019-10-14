@@ -2,42 +2,57 @@
 <!DOCTYPE html>
 <html lang='en'>
 <head>
-	   <meta http-equiv="content-type" content="text/html; charset=utf-8">
+	   <meta http-equiv="content-type" content="text/html; charset=utf-8" >
+	   <meta name = 'viewport' content = 'initial-scale = 1' >
 	   <style type="text/css">
 	   		@font-face { font-family: Hindi; src: url(/static/pdf.ttf); }
 			body {
-			    font-family: Hindi, Arial, 'sans-serif';
+			    font-family: Hindi, "Arial Black";
 			    color: #333333;
 			    line-height: 1.0em;
+			    font-size: 14px !important;
+			    word-break: break-word;
 			}
-			table { page-break-inside:auto }
-		    tr    { page-break-inside:avoid; page-break-after:auto }
+			/* table { page-break-inside:auto }
+		    tr    { page-break-inside:auto !important; page-break-after:avoid }
 		    thead { display:table-header-group }
-		    tfoot { display:table-footer-group }
+		    tfoot { display:table-footer-group } */
 	   		@page {
 	            size: A4;
 	            margin: 1cm;
 	            size: landscape;
 	        }
 	        b{
-	        	font-weight: 900;
+	        	font-weight: 900 !important;
 	        }
 	        .table {
 	            width: 100%;
 	            max-width: 100%;
 	            margin-bottom: 5px;
 	            background-color: #fff;
+	            border-spacing: 0px;
+	            table-layout:fixed;
+	            word-break:break-word;
 	        }
+	        * { 
+				  word-wrap:break-word;
+				}
 	        .table th,
 	        .table td {
-	            padding: 5px;
+	            padding: 0px;
 	            vertical-align: top;
-	            border-top: 1px solid #000;
+	            border-bottom: 2px solid #000;
+	            border-right: 2px solid #000;
+	            border-left: 2px solid #000;
 	            text-align: center;
+	            font-size: 16px !important;
+	            overflow-wrap: break-word;
+	            word-break:break-word !important;
 	        }
 	        .table thead th {
 	            vertical-align: bottom;
-	            border-bottom: 2px solid #000;
+	            border: 2px solid #000;
+	            border-top: 2px solid #000;
 	        }
 	        .table tbody + tbody {
 	            border-top: 2px solid #000;
@@ -45,7 +60,9 @@
 	        .table .table {
 	            background-color: #fff;
 	        }
-
+	        /* #sno {
+	        	width: 20px !important;
+	        } */
 	   </style>
 </head>
 <body style="padding:20px">
@@ -61,35 +78,38 @@
 	<p style="margin-top:8px">Given Information is provided by HARSAC about the detected Active Fire Location:</p>
 	<table class="table">
 		<thead>
-			<th>District</th>
-			<th>Block Name</th>
-			<th>Village Name</th>
-			<th>Longitude</th>
-			<th>Latitude</th>
-			<th>Acq_Date</th>
-			<th>Acq_Time</th>
-			<th>Murraba No.</th>
-			<th>Kila no.</th>
-			<th>Owners</th>
+			<!-- <th id="sno">Sno</th> -->
+			<th style="min-width:8%; word-break: break-word" width=300px>District</th>
+			<th style="min-width:8%; word-break: break-word" width=300px>Block Name</th>
+			<th style="min-width:8%; word-break: break-word" width=300px>Village Name</th>
+			<th style="min-width:8%; word-break: break-word" width=300px>Longitude</th>
+			<th style="min-width:8%; word-break: break-word" width=300px>Latitude</th>
+			<th style="min-width:8%; word-break: break-word" width=300px>Acq Date</th>
+			<th style="min-width:8%; word-break: break-word" width=300px>Acq Time</th>
+			<th style="min-width:8%; word-break: break-word" width=300px>Murraba No.</th>
+			<th style="min-width:8%; word-break: break-word" width=300px>Kila no.</th>
+			<th style="min-width:8%; word-break: break-word" width=300px>Owners</th>
 		</thead>
-		{% for row in data %}
-			<tr>
-				{% for x in row %}
-					<td>
-						{% if forloop.last %}
-					        {% for owner in x %}
-					        	{{owner}}
-					        	{% if not forloop.last %}
-					        		<br><hr>
-					        	{% endif %}
-					        {% endfor %}
-					    {% else %}
-					        {{ x }}
-					    {% endif %}
-					</td>
-				{% endfor %}
-			</tr>
-		{% endfor %}
+		<tbody>
+			{% for row in data %}
+				<tr>
+					<!-- <td id="sno">{{ forloop.counter }}</td> -->
+					{% for x in row %}
+						<td>{{x}}</td>
+							<!-- {% if forloop.last %}
+						        {% for owner in x %}
+						        	{{owner}}
+						        	{% if not forloop.last %}
+						        		<br>
+						        	{% endif %}
+						        {% endfor %}
+						    {% else %}
+						        {{ x }}
+						    {% endif %}  -->						
+					{% endfor %}
+				</tr>
+			{% endfor %}
+		</tbody>
 	</table>
 	<b><p>You are advised to act accordingly, and immediately.</p></b>
 	<div style="text-align: right">

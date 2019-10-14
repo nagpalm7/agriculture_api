@@ -589,13 +589,28 @@ class MailView(APIView):
             index = -1
             for mail in mail_data:
                 index += 1
+                table = mail_data[str(mail)]
+                new_table = []
+                for row in table:
+                    owners = row[9]
+                    for owner in owners:
+                        new_row = []
+                        if owners.index(owner) == 0:
+                            for x in range(9):
+                                new_row.append(row[x])
+                        else:
+                            for x in range(9):
+                                new_row.append("      ")
+                        new_row.append(owner)
+                        new_table.append(new_row)
+
                 district_mail_data = {
-                    'data': mail_data[str(mail)],
+                    'data': new_table,
                     'date': str(datetime.date.today().strftime("%d / %m / %Y")),
                     'sno': '00' + str(index + 1)
                 }
                 content = render_to_pdf('mail_dc.html',district_mail_data, encoding = 'utf-8')
-                with open(directory + 'mail_pdf.pdf', 'wb') as f:
+                with open(directory + str(mail) + '.pdf', 'wb') as f:
                     f.write(content)
 
                 # Send mail to DC
@@ -603,8 +618,8 @@ class MailView(APIView):
                 content = """
                     PFA
                 """
-                email = ['akash.akashdeepsharam@gmail.com']
-                send_email(subject, content, email, directory + 'mail_pdf.pdf')   # Send mail
+                email = ['nagpalm7@gmail.com', 'akash.akashdeepsharma@gmail.com']
+                send_email(subject, content, email, directory + str(mail) + '.pdf')   # Send mail
             return Response({'status': 'success', 'count': index}, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
