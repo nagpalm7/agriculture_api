@@ -1103,3 +1103,20 @@ class GeneratePasswordsForAdo(APIView):
         csvFile.close()
         absolute_path = DOMAIN + 'media/password/'+ filename
         return Response({'status': 200, 'csvFile':absolute_path})
+
+class Generate_Report(APIView):
+
+    def get(self, request, format = None):
+        directory = MEDIA_ROOT + '/reports/'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        filename = 'report.csv'
+        csvFile = open(directory + filename, 'w')
+        csvFile.write('Sno,District, Block Name, Village Name, Village Code, Longitude, Latitude, Acquired Date, Acquired Time, DDA Details, ADO Details, Farmer Name, Father Name, Kila Number, Murabba Number, Incident Reason, Remarks, Ownership/Lease, Action, Images, Password\n')
+        reports = AdoReport.objects.all()
+        for report in reports:
+            
+            csvFile.write(ado.name + ',' + ado.auth_user.username + ',' + password + '\n')
+        csvFile.close()
+        absolute_path = DOMAIN + 'media/password/'+ filename
+        return Response({'status': 200, 'csvFile':absolute_path})
