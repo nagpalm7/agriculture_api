@@ -1119,14 +1119,14 @@ class GenerateReport(APIView):
         if district and status:
             reports = AdoReport.objects.filter(
                 location__acq_date__range=[start, end], 
-                location__district=district, 
+                location__district=district.upper(), 
                 location__status=status
                 )
             filename = 'report_' + district + '_' + status + '.csv'
         elif district:
             reports = AdoReport.objects.filter(
                 location__acq_date__range=[start, end], 
-                location__district=district, 
+                location__district=district.upper(), 
                 )
             filename = 'report_all_' + district + '.csv'
         elif status:
