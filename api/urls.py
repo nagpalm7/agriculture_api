@@ -51,6 +51,7 @@ urlpatterns = [
     path('api/ado/csv/', views.GetListAdo.as_view(), name='print-ado'),
     path('api/ado-export-pdf/',views.ExportAdoPdf),
     path('api/generate-passwords-ado/',views.GeneratePasswordsForAdo.as_view()),
+    path('api/generate-report/',views.GenerateReport.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

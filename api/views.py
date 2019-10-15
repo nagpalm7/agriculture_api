@@ -516,9 +516,9 @@ class LocationList(APIView):
                 index = locations.index(data)
                 data = data.split(',')
                 request.data['state']  = data[0]
-                request.data['district'] = data[1]
-                request.data['block_name'] = data[2]
-                request.data['village_name'] = data[3]
+                request.data['district'] = data[1].upper()
+                request.data['block_name'] = data[2].upper()
+                request.data['village_name'] = data[3].upper()
                 request.data['longitude'] = data[4]
                 request.data['latitude'] = data[5]
                 request.data['acq_date'] = datetime.datetime.strptime(data[6], '%m/%d/%Y').strftime('%Y-%m-%d')
@@ -1104,19 +1104,149 @@ class GeneratePasswordsForAdo(APIView):
         absolute_path = DOMAIN + 'media/password/'+ filename
         return Response({'status': 200, 'csvFile':absolute_path})
 
-class Generate_Report(APIView):
+class GenerateReport(APIView):
 
     def get(self, request, format = None):
         directory = MEDIA_ROOT + '/reports/'
         if not os.path.exists(directory):
             os.makedirs(directory)
-        filename = 'report.csv'
+        # get params district and range
+        start = datetime.datetime.strptime(request.GET.get('start'), '%Y-%m-%d').strftime('%Y-%m-%d')
+        end = datetime.datetime.strptime(request.GET.get('end'), '%Y-%m-%d').strftime('%Y-%m-%d')
+        district = request.GET.get('district', None)
+        status = request.GET.get('status', None)
+        reports = []
+        if district and status:
+            reports = AdoReport.objects.filter(
+                location__acq_date__range=[start, end], 
+                location__district=district, 
+                location__status=status
+                )
+            filename = 'report_' + district + '_' + status + '.csv'
+        elif district:
+            reports = AdoReport.objects.filter(
+                location__acq_date__range=[start, end], 
+                location__district=district, 
+                )
+            filename = 'report_all_' + district + '.csv'
+        elif status:
+            reports = AdoReport.objects.filter(
+                location__acq_date__range=[start, end], 
+                location__status=status
+                )
+            filename = 'report_all_' + status + '.csv'
+        else:
+            reports = AdoReport.objects.filter(
+                location__acq_date__range=[start, end], 
+                )
+            filename = 'report_all.csv'
         csvFile = open(directory + filename, 'w')
-        csvFile.write('Sno,District, Block Name, Village Name, Village Code, Longitude, Latitude, Acquired Date, Acquired Time, DDA Details, ADO Details, Farmer Name, Father Name, Kila Number, Murabba Number, Incident Reason, Remarks, Ownership/Lease, Action, Images, Password\n')
-        reports = AdoReport.objects.all()
+        csvFile.write('Sno,District, Block Name, Village Name, Village Code, Longitude, Latitude, Acquired Date, Acquired Time, DDA Details, ADO Details, Farmer Name, Father Name, Kila Number, Murabba Number, Incident Reason, Remarks, Ownership/Lease, Action, Images\n')
+        sno = 0
+        print(reports.count)
+        print(reports[0])
         for report in reports:
-            
-            csvFile.write(ado.name + ',' + ado.auth_user.username + ',' + password + '\n')
+            sno += 1
+            dis = ''
+            if report.location.district:
+                dis = str(report.location.district)
+
+            block = ''
+            if report.location.block_name:
+                block = str(report.location.block_name)
+
+            village = ''
+            if report.location.village_name:
+                village = str(report.location.village_name)
+
+            village_code = ''
+            if report.village_code:
+                village_code = str(report.village_code)
+
+            longitude = ''
+            if report.location.longitude:
+                longitude = str(report.location.longitude)
+
+            latitude = ''
+            if report.location.latitude:
+                latitude = str(report.location.latitude)
+
+            acq_date = ''
+            if report.location.acq_date:
+                acq_date = str(report.location.acq_date)
+
+            acq_time = ''
+            if report.location.acq_time:
+                acq_time = str(report.location.acq_time)
+
+            dda = ''
+            if report.location.dda:
+                dda = str(report.location.dda.name)
+
+            ado = ''
+            if report.location.ado:
+                ado = str(report.location.ado.name)
+
+            farmer_name = ''
+            if report.farmer_name:
+                farmer_name = str(report.farmer_name)
+
+            father_name = ''
+            if report.father_name:
+                father_name = str(report.father_name)
+
+            kila_num = ''
+            if report.kila_num:
+                kila_num = str(report.kila_num)
+
+            murrabba_num = ''
+            if report.murrabba_num:
+                murrabba_num = str(report.murrabba_num)
+
+            incident_reason = ''
+            if report.incident_reason:
+                incident_reason = str(report.incident_reason)
+
+            remarks = ''
+            if report.remarks:
+                remarks = str(report.remarks)
+
+            ownership = ''
+            if report.ownership:
+                ownership = str(report.ownership)
+
+            action = ''
+            if report.action:
+                action = str(report.action)
+
+            images = Image.objects.filter(report = report).order_by('-pk')
+            if len(images) > 0:
+                img = [DOMAIN + 'media/' + str(i.image) for i in images ]
+            else:
+                img = []
+            print(img)
+            csvFile.write(
+                  str(sno) + ',' 
+                + str(dis) + ',' 
+                + str(block) + ',' 
+                + str(village) + ',' 
+                + str(village_code) + ',' 
+                + str(longitude) + ',' 
+                + str(latitude) + ',' 
+                + str(acq_date) + ',' 
+                + str(acq_time) + ',' 
+                + str(dda) + ',' 
+                + str(ado) + ',' 
+                + str(farmer_name) + ',' 
+                + str(father_name) + ',' 
+                + str(kila_num) + ',' 
+                + str(murrabba_num) + ',' 
+                + str(incident_reason) + ',' 
+                + str(remarks) + ',' 
+                + str(ownership) + ',' 
+                + str(action) + ',' 
+                + str(' | '.join(img)) + ','
+                + '\n')
         csvFile.close()
-        absolute_path = DOMAIN + 'media/password/'+ filename
+        absolute_path = DOMAIN + 'media/reports/'+ filename
         return Response({'status': 200, 'csvFile':absolute_path})
