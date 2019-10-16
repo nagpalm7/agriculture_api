@@ -16,6 +16,7 @@ from django.db.models import Q
 import http.client
 import uuid
 import xlrd
+import logging
 
 from io import BytesIO
 from django_filters.rest_framework import DjangoFilterBackend
@@ -23,6 +24,8 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 import xhtml2pdf.pisa as pisa
 from easy_pdf.rendering import render_to_pdf
+
+logger = logging.getLogger(__name__)
 
 # Helper function to send email
 def send_email(subject, content, recipient_list, path=None):
@@ -588,6 +591,7 @@ class MailView(APIView):
                     mail_data[str(district)].append(data)
             index = -1
             for mail in mail_data:
+                logger.info("The value of var is %s", mail)
                 index += 1
                 new_table = {}
                 owners = []
@@ -625,7 +629,7 @@ class MailView(APIView):
                     <b>Department of Agriculture and Farmers Welfare, Haryana</b><br>
                 """
                 # email += ['akash.akashdepsharma@gmail.com']
-                print(email)
+                logger.info("The value of var is ", email)
                 send_email(subject, content, email, directory + str(mail) + '.pdf')   # Send mail
             return Response({'status': 'success', 'count': index+1}, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
