@@ -106,6 +106,15 @@ class Dda(models.Model):
         on_delete=models.CASCADE,
     )
 
+    def save(self, *args, **kwargs):
+        if self.email:
+            self.auth_user.email = self.email
+            self.auth_user.save()
+        else:
+            self.auth_user.email = ''
+            self.auth_user.save()
+        return super(Dda, self).save(*args, **kwargs)
+
     def __str__(self):
         if self.district:
             return str(self.name + ' (' + self.district.district + ')')
@@ -122,6 +131,15 @@ class Ado(models.Model):
         User,
         on_delete=models.CASCADE,
     )
+
+    def save(self, *args, **kwargs):
+        if self.email:
+            self.auth_user.email = self.email
+            self.auth_user.save()
+        else:
+            self.auth_user.email = ''
+            self.auth_user.save()
+        return super(Ado, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.name)
