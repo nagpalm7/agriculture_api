@@ -556,9 +556,9 @@ class MailView(APIView):
         locations = []
         count = 0
         if 'location_csv' in request.data:
-            if not request.data['location_csv'].name.endswith('.xlsx') or not request.data['location_csv'].name.endswith('.xls'):
+            if not request.data['location_csv'].name.endswith('.xlsx') and not request.data['location_csv'].name.endswith('.xls'):
                 return Response({'location_csv': ['Please upload a valid document ending with .xlsx or xls']},
-                    status = HTTP_400_BAD_REQUEST)
+                    status = status.HTTP_400_BAD_REQUEST)
             fs = FileSystemStorage()
             fs.save(directory + request.data['location_csv'].name, request.data['location_csv'])
             wb = xlrd.open_workbook(directory + request.data['location_csv'].name) 
