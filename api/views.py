@@ -617,9 +617,12 @@ class MailView(APIView):
                     f.write(content)
 
                 # Send mail to DC
-                subject = "Report For Active Fire Locations"
+                subject = "Stubble Burning Reporting"
                 content = """
-                    PFA
+                    Respected Sir/Madam,<br><br>
+                    Please find the attachment(s) containing data of AFL detected by HARSAC and list of owners and details of their Land.<br><br>
+                    <b>Thank you</b><br>
+                    <b>Department of Agriculture and Farmers Welfare, Haryana</b><br>
                 """
                 # email += ['akash.akashdepsharma@gmail.com']
                 send_email(subject, content, email, directory + str(mail) + '.pdf')   # Send mail
