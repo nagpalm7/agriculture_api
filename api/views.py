@@ -556,7 +556,7 @@ class MailView(APIView):
         locations = []
         count = 0
         if 'location_csv' in request.data:
-            if not request.data['location_csv'].name.endswith('.xlsx') or request.data['location_csv'].name.endswith('.xls'):
+            if not request.data['location_csv'].name.endswith('.xlsx') or not request.data['location_csv'].name.endswith('.xls'):
                 return Response({'location_csv': ['Please upload a valid document ending with .xlsx or xls']},
                     status = HTTP_400_BAD_REQUEST)
             fs = FileSystemStorage()
@@ -625,8 +625,9 @@ class MailView(APIView):
                     <b>Department of Agriculture and Farmers Welfare, Haryana</b><br>
                 """
                 # email += ['akash.akashdepsharma@gmail.com']
+                print(email)
                 send_email(subject, content, email, directory + str(mail) + '.pdf')   # Send mail
-            return Response({'status': 'success', 'count': index}, status=status.HTTP_201_CREATED)
+            return Response({'status': 'success', 'count': index+1}, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
 # Shows list of locations for specific ado for admin
