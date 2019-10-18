@@ -1151,8 +1151,6 @@ class GenerateReport(APIView):
         csvFile = open(directory + filename, 'w')
         csvFile.write('Sno,District, Block Name, Village Name, Village Code, Longitude, Latitude, Acquired Date, Acquired Time, DDA Details, ADO Details, Farmer Name, Father Name, Kila Number, Murabba Number, Incident Reason, Remarks, Ownership/Lease, Action, Images\n')
         sno = 0
-        print(reports.count)
-        print(reports[0])
         for report in reports:
             sno += 1
             dis = ''
