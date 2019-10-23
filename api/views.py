@@ -1097,17 +1097,17 @@ class GeneratePasswordsForAdo(APIView):
             os.makedirs(directory)
         filename = 'password.csv'
         csvFile = open(directory + filename, 'w')
-        csvFile.write('Name,Username,Password\n')
+        csvFile.write('District, Name,Username,Password\n')
         ados = Ado.objects.all()
         for ado in ados:
-            try:
-                user = User.objects.get(pk=ado.auth_user.pk)
-            except User.DoesNotExist:
-                continue
+            user = ado.auth_user
             password = uuid.uuid4().hex[:8].lower()
             user.set_password(password)
             user.save()
-            csvFile.write(ado.name + ',' + ado.auth_user.username + ',' + password + '\n')
+            district = ''
+            if ado.dda:
+                district = ado.dda.district
+            csvFile.write(district + ',' + ado.name + ',' + ado.auth_user.username + ',' + password + '\n')
         csvFile.close()
         absolute_path = DOMAIN + 'media/password/'+ filename
         return Response({'status': 200, 'csvFile':absolute_path})
