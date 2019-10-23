@@ -12,7 +12,7 @@ import datetime
 from agriculture.settings import MEDIA_ROOT, DOMAIN, EMAIL_HOST_USER
 from django.core.files.storage import FileSystemStorage
 import os
-from django.db.models import Q
+from django.db.models import Q,Count
 import http.client
 import uuid
 import xlrd
@@ -115,14 +115,7 @@ class UserDetail(APIView):
 
     def delete(self, request, pk, format = None):
         user = self.get_object(pk)
-        type_of_user = user.type_of_user
-        if type_of_user == 'admin':
-            data = Admin.objects.get(auth_user=pk)
-        elif type_of_user == 'dda':
-            data = Dda.objects.get(auth_user=pk)
-        elif type_of_user == 'ado':
-            data = Ado.objects.get(auth_user=pk)
-        data.delete()
+        user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)            
 
 # DDA List
@@ -745,7 +738,7 @@ class VillagesDistrictWiseViewSet(viewsets.ReadOnlyModelViewSet):
             district = District.objects.get(id=self.kwargs['pk'])
         except District.DoesNotExist:
             raise Http404
-        villages = Village.objects.filter(district = district).order_by('village')
+        villages = Village.objects.filter(district = district).annotate(count = Count('id')).order_by('village')
         return villages
 
 # ADO reports Views
@@ -1123,33 +1116,91 @@ class GenerateReport(APIView):
         end = datetime.datetime.strptime(request.GET.get('end'), '%Y-%m-%d').strftime('%Y-%m-%d')
         district = request.GET.get('district', None)
         status = request.GET.get('status', None)
+        village = request.GET.get('village',None)
+        ado = request.GET.get('ado',None)
         reports = []
-        if district and status:
-            reports = AdoReport.objects.filter(
-                location__acq_date__range=[start, end], 
-                location__district=district.upper(), 
-                location__status=status
-                )
-            filename = 'report_' + district + '_' + status + '.csv'
-        elif district:
-            reports = AdoReport.objects.filter(
-                location__acq_date__range=[start, end], 
-                location__district=district.upper(), 
-                )
-            filename = 'report_all_' + district + '.csv'
-        elif status:
-            reports = AdoReport.objects.filter(
-                location__acq_date__range=[start, end], 
-                location__status=status
-                )
-            filename = 'report_all_' + status + '.csv'
-        else:
-            reports = AdoReport.objects.filter(
-                location__acq_date__range=[start, end], 
-                )
-            filename = 'report_all.csv'
+        locations = []
+        if status == 'pending':
+             if district and village:
+                 reports = AdoReport.objects.filter(
+                     location__created_on_range=[start, end],
+                     location__district=district.upper(),
+                     location__status=status,
+                     location_village=village.upper()
+                 )
+                 filename = 'report_' + status + '_' + district + '_' + village + '.csv'
+             elif district and ado:
+                 reports = AdoReport.objects.filter(
+                     location__created_on_range=[start, end],
+                     location__district=district.upper(),
+                     location__status=status,
+                     location_ado=ado.upper()
+                 )
+                 filename = 'report_' + status +'_'+ district + ado +'.csv'
+             elif district:
+                 reports = AdoReport.objects.filter(
+                     location__created_on_range=[start, end],
+                     location__district=district.upper(),
+                     location__status=status,
+                 )
+                 filename = 'report_' + status +'_'+ district +'.csv'    
+                  
+        else:  
+             if district and status and village:
+                 reports = AdoReport.objects.filter(
+                     location__created_on_range=[start, end],
+                     location__district=district.upper(),
+                     location__status=status,
+                     location_village=village.upper()
+                 )
+                 filename = 'report_' + status + '_' + district + '_' + village + '.csv'
+             elif district:
+                 reports = AdoReport.objects.filter(
+                     location__created_on_range=[start, end],
+                     location__district=district.upper(),
+                 )
+                 filename = 'report_all_' + district + '.csv'
+             elif status:
+                 reports = AdoReport.objects.filter(
+                     location__created_on_range=[start, end],
+                     location__status=status
+                 )
+                 filename = 'report_all_' + status + '.csv'
+             elif status and village:
+                 reports = AdoReport.objects.filter(
+                     location__created_on_range=[start, end],
+                     location__status=status,
+                     location_village=village.upper(),
+                 )
+                 filename = 'report_' + status + '_' + village + '.csv'
+             elif district and village:
+                 reports = AdoReport.objects.filter(
+                     location__created_on_range=[start, end],
+                     location__district=district.upper(),
+                     location_village=village.upper(),
+                 )
+                 filename = 'report_' + district + '_' + village + '.csv'
+             elif status and ado:
+                 reports = AdoReport.objects.filter(
+                     location__created_on_range=[start, end],
+                     location__status=status,
+                     location_ado=ado.upper(),
+                 )
+                 filename = 'report_' + status + '_' + ado + '.csv'
+             elif district and ado:
+                 reports = AdoReport.objects.filter(
+                     location__created_on_range=[start, end],
+                     location__district=district.upper(),
+                     location_ado=ado.upper(),
+                 )
+                 filename = 'report_' + district + '_' + ado + '.csv'
+             else:
+                 reports = AdoReport.objects.filter(
+                     location__created_on_range=[start, end],
+                 )
+                 filename = 'report_all.csv'
         csvFile = open(directory + filename, 'w')
-        csvFile.write('Sno,District, Block Name, Village Name, Village Code, Longitude, Latitude, Acquired Date, Acquired Time, DDA Details, ADO Details, Farmer Name, Father Name, Kila Number, Murabba Number, Incident Reason, Remarks, Ownership/Lease, Action, Images\n')
+        csvFile.write('Sno,District, Block Name, Village Name, Village Code, Longitude, Latitude,Created On ,Acquired Date, Acquired Time, DDA Details, ADO Details, Farmer Name, Father Name, Kila Number, Murabba Number, Incident Reason, Remarks, Ownership/Lease, Action, Images\n')
         sno = 0
         for report in reports:
             sno += 1
@@ -1176,6 +1227,10 @@ class GenerateReport(APIView):
             latitude = ''
             if report.location.latitude:
                 latitude = str(report.location.latitude)
+            
+            created_on = ''
+            if report.location.created_on:
+                created_on = str(report.location.created_on)
 
             acq_date = ''
             if report.location.acq_date:
@@ -1239,6 +1294,7 @@ class GenerateReport(APIView):
                 + str(village_code) + ',' 
                 + str(longitude) + ',' 
                 + str(latitude) + ',' 
+                + str(created_on) + ','
                 + str(acq_date) + ',' 
                 + str(acq_time) + ',' 
                 + str(dda) + ',' 
