@@ -2,8 +2,10 @@ myvenv
 env
 db.sqlite3
 *.pyc
+myEnv
 media
 myvenv
+debug.log
 requirements.txt.save
 agriculture/static
 
