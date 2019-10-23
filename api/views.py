@@ -547,6 +547,16 @@ class LocationList(APIView):
             return Response({'status': 'success', 'count': count}, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
+# helper function
+def floatHourToTime(fh):
+    h, r = divmod(fh, 1)
+    m, r = divmod(r*60, 1)
+    return (
+        int(h),
+        int(m),
+        int(r*60),
+    )
+
 # Upload CSV for FIR
 class MailView(APIView):
     permission_classes = []
@@ -584,6 +594,10 @@ class MailView(APIView):
                 # Create mail data district wise
                 count += 1
                 district = data[0].rstrip().upper()
+                dt = datetime.datetime.fromordinal(datetime.datetime(1900, 1, 1).toordinal() + int(data[5]) - 2)
+                hour, minute, second = floatHourToTime(data[5] % 1)
+                dt = dt.replace(hour=hour, minute=minute, second=second)
+                data[5] = str(dt).split(' ')[0]
                 if str(district) in mail_data:
                     mail_data[str(district)].append(data)
                 else:
@@ -1106,7 +1120,7 @@ class GeneratePasswordsForAdo(APIView):
             user.save()
             district = ''
             if ado.dda:
-                district = ado.dda.district
+                district = ado.dda.district.district
             csvFile.write(district + ',' + ado.name + ',' + ado.auth_user.username + ',' + password + '\n')
         csvFile.close()
         absolute_path = DOMAIN + 'media/password/'+ filename
