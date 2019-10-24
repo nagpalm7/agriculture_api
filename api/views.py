@@ -1,4 +1,4 @@
-from rest_framework import status
+from rest_framework import status,generics
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -1187,57 +1187,60 @@ class GenerateLocationReport(APIView):
                  acq_date__range=[start, end],
              )
             filename = 'location_report_all.csv' 
-        csvFile = open(directory + filename, 'w')
-        csvFile.write('Sno, District, Block, Village, Longitude, Latitude, Acquired Date, Dda Details, Ado Details\n')
-        sno = 0
-        for location in locations:
-            sno += 1
-            dis = ''
-            if location.district:
-                dis = str(location.district)
+        if len(locations) == 0:
+            return Response({'status' : 204})
+        else:    
+            csvFile = open(directory + filename, 'w')
+            csvFile.write('Sno, District, Block, Village, Longitude, Latitude, Acquired Date, Dda Details, Ado Details\n')
+            sno = 0
+            for location in locations:
+                sno += 1
+                dis = ''
+                if location.district:
+                    dis = str(location.district)
 
-            block = ''
-            if location.block_name:
-                block = str(location.block_name)
+                block = ''
+                if location.block_name:
+                    block = str(location.block_name)
 
-            village = ''
-            if location.village_name:
-                village = str(location.village_name)
+                village = ''
+                if location.village_name:
+                    village = str(location.village_name)
 
-            longitude = ''
-            if location.longitude:
-                longitude = str(location.longitude)
+                longitude = ''
+                if location.longitude:
+                    longitude = str(location.longitude)
             
-            latitude = ''
-            if location.latitude:
-                latitude = str(location.latitude)
+                latitude = ''
+                if location.latitude:
+                    latitude = str(location.latitude)
             
-            acq_date = ''
-            if location.acq_date:
-                acq_date = str(location.acq_date) 
+                acq_date = ''
+                if location.acq_date:
+                    acq_date = str(location.acq_date) 
            
-            dda = ''
-            if location.dda:
-                dda = str(location.dda.name)
+                dda = ''
+                if location.dda:
+                    dda = str(location.dda.name)
 
-            ado = ''
-            if location.ado:
-                ado = str(location.ado.name)   
+                ado = ''
+                if location.ado:
+                    ado = str(location.ado.name)   
 
-            csvFile.write(
-                  str(sno) + ',' 
-                + str(dis) + ',' 
-                + str(block) + ',' 
-                + str(village) + ','
-                + str(longitude) + ',' 
-                + str(latitude) + ',' 
-                + str(acq_date) + ',' 
-                + str(dda) + ','
-                + str(ado) + ','
-                + '\n') 
-        csvFile.close()
-        absolute_path = DOMAIN + 'media/status_report/'+ filename
-        return Response({'status': 200,'csvFile':absolute_path})          
+                csvFile.write(
+                    str(sno) + ',' 
+                  + str(dis) + ',' 
+                  + str(block) + ',' 
+                  + str(village) + ','
+                  + str(longitude) + ',' 
+                  + str(latitude) + ',' 
+                  + str(acq_date) + ',' 
+                  + str(dda) + ','
+                  + str(ado) + ','
+                  + '\n') 
+            csvFile.close()
+            absolute_path = DOMAIN + 'media/status_report/'+ filename
+            return Response({'status': 200,'csvFile':absolute_path})          
 
 class GenerateReport(APIView):
      def get(self, request, format = None):
@@ -1321,111 +1324,118 @@ class GenerateReport(APIView):
                  location__acq_date__range=[start, end],
              )
             filename = 'report_all.csv'
-        csvFile = open(directory + filename, 'w')
-        csvFile.write('Sno,District, Block Name, Village Name, Village Code, Longitude, Latitude, Acquired Date, Acquired Time, DDA Details, ADO Details, Farmer Name, Father Name, Kila Number, Murabba Number, Incident Reason, Remarks, Ownership/Lease, Action, Images\n')
-        sno = 0
-        for report in reports:
-            sno += 1
-            dis = ''
-            if report.location.district:
-                dis = str(report.location.district)
+        
+        if len(reports) == 0:
+            return Response({'status' : 204})  
+        else:    
+            csvFile = open(directory + filename, 'w')
+            csvFile.write('Sno,District, Block Name, Village Name, Village Code, Longitude, Latitude, Acquired Date, Acquired Time, DDA Details, ADO Details, Farmer Name, Father Name, Kila Number, Murabba Number, Incident Reason, Remarks, Ownership/Lease, Action, Images\n')
+            sno = 0
+            for report in reports:
+                sno += 1
+                dis = ''
+                if report.location.district:
+                    dis = str(report.location.district)
 
-            block = ''
-            if report.location.block_name:
-                block = str(report.location.block_name)
+                block = ''
+                if report.location.block_name:
+                    block = str(report.location.block_name)
 
-            village = ''
-            if report.village:
-                village = str(report.village.village)
+                village = ''
+                if report.village:
+                    village = str(report.village.village)
 
-            village_code = ''
-            if report.village_code:
-                village_code = str(report.village_code)
+                village_code = ''
+                if report.village_code:
+                    village_code = str(report.village_code)
 
-            longitude = ''
-            if report.location.longitude:
-                longitude = str(report.location.longitude)
+                longitude = ''
+                if report.location.longitude:
+                    longitude = str(report.location.longitude)
 
-            latitude = ''
-            if report.location.latitude:
-                latitude = str(report.location.latitude)
+                latitude = ''
+                if report.location.latitude:
+                    latitude = str(report.location.latitude)
 
-            acq_date = ''
-            if report.location.acq_date:
-                acq_date = str(report.location.acq_date)
+                acq_date = ''
+                if report.location.acq_date:
+                    acq_date = str(report.location.acq_date)
 
-            acq_time = ''
-            if report.location.acq_time:
-                acq_time = str(report.location.acq_time)
+                acq_time = ''
+                if report.location.acq_time:
+                    acq_time = str(report.location.acq_time)
 
-            dda = ''
-            if report.location.dda:
-                dda = str(report.location.dda.name)
+                dda = ''
+                if report.location.dda:
+                    dda = str(report.location.dda.name)
 
-            ado = ''
-            if report.location.ado:
-                ado = str(report.location.ado.name)
+                ado = ''
+                if report.location.ado:
+                    ado = str(report.location.ado.name)
 
-            farmer_name = ''
-            if report.farmer_name:
-                farmer_name = str(report.farmer_name)
+                farmer_name = ''
+                if report.farmer_name:
+                    farmer_name = str(report.farmer_name)
 
-            father_name = ''
-            if report.father_name:
-                father_name = str(report.father_name)
+                father_name = ''
+                if report.father_name:
+                    father_name = str(report.father_name)
 
-            kila_num = ''
-            if report.kila_num:
-                kila_num = str(report.kila_num)
+                kila_num = ''
+                if report.kila_num:
+                    kila_num = str(report.kila_num)
 
-            murrabba_num = ''
-            if report.murrabba_num:
-                murrabba_num = str(report.murrabba_num)
+                murrabba_num = ''
+                if report.murrabba_num:
+                    murrabba_num = str(report.murrabba_num)
 
-            incident_reason = ''
-            if report.incident_reason:
-                incident_reason = str(report.incident_reason)
+                incident_reason = '' 
+                if report.incident_reason:
+                    incident_reason = str(report.incident_reason)
 
-            remarks = ''
-            if report.remarks:
-                remarks = str(report.remarks)
+                remarks = ''
+                if report.remarks:
+                     remarks = str(report.remarks)
 
-            ownership = ''
-            if report.ownership:
-                ownership = str(report.ownership)
+                ownership = ''
+                if report.ownership:
+                    ownership = str(report.ownership)
 
-            action = ''
-            if report.action:
-                action = str(report.action)
+                action = ''
+                if report.action:
+                    action = str(report.action)
 
-            images = Image.objects.filter(report = report).order_by('-pk')
-            if len(images) > 0:
-                img = [DOMAIN + 'media/' + str(i.image) for i in images ]
-            else:
-                img = []
-            print(img)
-            csvFile.write(
-                  str(sno) + ',' 
-                + str(dis) + ',' 
-                + str(block) + ',' 
-                + str(village) + ',' 
-                + str(village_code) + ',' 
-                + str(longitude) + ',' 
-                + str(latitude) + ',' 
-                + str(acq_date) + ',' 
-                + str(acq_time) + ',' 
-                + str(dda) + ',' 
-                + str(ado) + ',' 
-                + str(farmer_name) + ',' 
-                + str(father_name) + ',' 
-                + str(kila_num) + ',' 
-                + str(murrabba_num) + ',' 
-                + str(incident_reason) + ',' 
-                + str(remarks) + ',' 
-                + str(ownership) + ',' 
-                + str(action) + ',' 
-                + str(' | '.join(img)) + ','
-                + '\n')
-        csvFile.close()
-        absolute_path = DOMAIN + 'media/reports/'+ filename
-        return Response({'status': 200, 'csvFile':absolute_path})
+                images = Image.objects.filter(report = report).order_by('-pk')
+                if len(images) > 0:
+                    img = [DOMAIN + 'media/' + str(i.image) for i in images ]
+                else:
+                    img = []
+                print(img)    
+                csvFile.write(
+                    str(sno) + ',' 
+                  + str(dis) + ',' 
+                  + str(block) + ',' 
+                  + str(village) + ',' 
+                  + str(village_code) + ',' 
+                  + str(longitude) + ',' 
+                  + str(latitude) + ',' 
+                  + str(acq_date) + ',' 
+                  + str(acq_time) + ',' 
+                  + str(dda) + ',' 
+                  + str(ado) + ',' 
+                  + str(farmer_name) + ',' 
+                  + str(father_name) + ',' 
+                  + str(kila_num) + ',' 
+                  + str(murrabba_num) + ',' 
+                  + str(incident_reason) + ',' 
+                  + str(remarks) + ',' 
+                  + str(ownership) + ',' 
+                  + str(action) + ',' 
+                  + str(' | '.join(img)) + ','
+                  + '\n')
+            csvFile.close()
+            absolute_path = DOMAIN + 'media/reports/'+ filename
+            return Response({'status': 200, 'csvFile':absolute_path})
+
+
+    
