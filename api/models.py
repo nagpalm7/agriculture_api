@@ -145,7 +145,6 @@ class Ado(models.Model):
         return str(self.name)
 
 class Location(models.Model):
-    created_on = models.DateField(default = timezone.now,auto_now=True)
     state = models.CharField(max_length = 50, blank = False, null = False, unique = False)
     district = models.CharField(max_length = 50, blank = False, null = False, unique = False)
     block_name = models.CharField(max_length = 50, blank = True, null = True, unique = False)
@@ -173,7 +172,6 @@ class Location(models.Model):
         return self.district + ' ' + self.state
  
 class AdoReport(models.Model):
-    created_on = models.DateField(default = timezone.now,auto_now=True)
     village_code = models.CharField(max_length = 50, blank = True, null = True, unique = False)
     village = models.ForeignKey(Village, on_delete = models.CASCADE, blank = True, null = True, default = None, related_name = 'location_village')
     farmer_code = models.CharField(max_length = 50, blank = True, null = True, unique = False)
