@@ -484,6 +484,66 @@ class AdoViewSet(viewsets.ReadOnlyModelViewSet):
 class LocationList(APIView):
     permission_classes = []
 
+    def get(self, request, format = None):
+        locations = []
+        start = request.GET.get('start',None)
+        end = request.GET.get('end', None)
+        district = request.GET.get('district', None)
+        status = request.GET.get('status', None)
+        dda = request.GET.get('dda', None)
+        if dda:
+            if start and end:
+                start = datetime.datetime.strptime(start, '%Y-%m-%d').strftime('%Y-%m-%d')
+                end = datetime.datetime.strptime(end, '%Y-%m-%d').strftime('%Y-%m-%d')
+                if district:
+                    if status:
+                        locations = Location.objects.filter(district=district.upper(), status=status, acq_date__range=[start,end], dda__pk=int(dda)).order_by('-pk')
+                    else:
+                        locations = Location.objects.filter(district=district.upper(), acq_date__range=[start,end], dda__pk=int(dda)).order_by('-pk')
+                else:
+                    if status:
+                        locations = Location.objects.filter(status=status, acq_date__range=[start,end], dda__pk=int(dda)).order_by('-pk')
+                    else:
+                        locations = Location.objects.filter(acq_date__range=[start,end], dda__pk=int(dda)).order_by('-pk')
+            else:
+                if district:
+                    if status:
+                        locations = Location.objects.filter(district=district.upper(), status=status, dda__pk=int(dda)).order_by('-pk')
+                    else:
+                        locations = Location.objects.filter(district=district.upper(), dda__pk=int(dda)).order_by('-pk')
+                else:
+                    if status:
+                        locations = Location.objects.filter(status=status, dda__pk=int(dda)).order_by('-pk')
+                    else:
+                        locations = Location.objects.filter(dda__pk=int(dda)).order_by('-pk')
+        else:
+            if start and end:
+                start = datetime.datetime.strptime(start, '%Y-%m-%d').strftime('%Y-%m-%d')
+                end = datetime.datetime.strptime(end, '%Y-%m-%d').strftime('%Y-%m-%d')
+                if district:
+                    if status:
+                        locations = Location.objects.filter(district=district.upper(), status=status, acq_date__range=[start,end]).order_by('-pk')
+                    else:
+                        locations = Location.objects.filter(district=district.upper(), acq_date__range=[start,end]).order_by('-pk')
+                else:
+                    if status:
+                        locations = Location.objects.filter(status=status, acq_date__range=[start,end]).order_by('-pk')
+                    else:
+                        locations = Location.objects.filter(acq_date__range=[start,end]).order_by('-pk')
+            else:
+                if district:
+                    if status:
+                        locations = Location.objects.filter(district=district.upper(), status=status).order_by('-pk')
+                    else:
+                        locations = Location.objects.filter(district=district.upper()).order_by('-pk')
+                else:
+                    if status:
+                        locations = Location.objects.filter(status=status).order_by('-pk')
+                    else:
+                        locations = Location.objects.all().order_by('-pk')
+        serializer = LocationSerializer(locations, many=True)
+        return Response(serializer.data)
+
     def post(self, request, format = None):
         directory = MEDIA_ROOT + '/locationCSVs/'
         if not os.path.exists(directory):
