@@ -1358,7 +1358,6 @@ class GenerateReport(APIView):
                 village = ''
                 if report.village:
                     village = str(report.village.village)
-
                 village_code = ''
                 if report.village_code:
                     village_code = str(report.village_code)
@@ -1424,7 +1423,6 @@ class GenerateReport(APIView):
                     img = [DOMAIN + 'media/' + str(i.image) for i in images ]
                 else:
                     img = []
-                print(img)    
                 csvFile.write(
                     str(sno) + ',' 
                   + str(dis) + ',' 
