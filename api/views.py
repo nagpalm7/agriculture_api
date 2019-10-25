@@ -541,7 +541,7 @@ class LocationList(APIView):
                         locations = Location.objects.filter(status=status).order_by('-pk')
                     else:
                         locations = Location.objects.all().order_by('-pk')
-        serializer = LocationSerializer(locations, many=True)
+        serializer = MapSerializer(locations, many=True, context={'request':request})
         return Response(serializer.data)
 
     def post(self, request, format = None):

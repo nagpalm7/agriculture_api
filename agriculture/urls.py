@@ -23,7 +23,7 @@ from rest_auth.views import PasswordResetConfirmView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('rest-auth/', include('rest_auth.urls')),
-    path('', include('api.urls')),
+    path('', include(('api.urls', 'api'), namespace='api')),
     re_path(r'^rest-auth/password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
 ]
 

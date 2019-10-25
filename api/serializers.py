@@ -99,7 +99,12 @@ class LocationSerializer(serializers.ModelSerializer):
     dda = DdaSerializer()
     class Meta:
         model = Location
-        fields = '__all__'                        
+        fields = '__all__'
+
+class MapSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Location
+        fields = '__all__'                    
 
 class AdoReportSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
