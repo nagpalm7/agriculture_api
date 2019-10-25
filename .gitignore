@@ -6,4 +6,4 @@ media
 myvenv
 requirements.txt.save
 agriculture/static
-
+debug.log
