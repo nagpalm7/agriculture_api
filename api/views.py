@@ -403,11 +403,11 @@ class LocationViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         stat = self.kwargs['status']
         if stat == 'unassigned':
-            locations = Location.objects.filter(status='pending', ado=None).order_by('village_name', 'block_name', 'district')
+            locations = Location.objects.filter(status='pending', ado=None).order_by('acq_date', 'district', 'block_name', 'village_name')
         elif stat == 'assigned':
-            locations = Location.objects.filter(status='pending').exclude(ado=None).order_by('village_name', 'block_name', 'district')
+            locations = Location.objects.filter(status='pending').exclude(ado=None).order_by('acq_date', 'district', 'block_name', 'village_name')
         else:
-            locations = Location.objects.filter(status=stat).order_by('village_name', 'block_name', 'district')
+            locations = Location.objects.filter(status=stat).order_by('acq_date', 'district', 'block_name', 'village_name')
         return locations
 
 # Shows list of locations for specific ado logged in
@@ -428,9 +428,9 @@ class LocationViewSetAdo(viewsets.ReadOnlyModelViewSet):
         stat = self.kwargs['status']
         locations = []
         if stat == 'pending':
-            locations = Location.objects.filter(status=stat, ado=user).order_by('village_name', 'block_name', 'district')
+            locations = Location.objects.filter(status=stat, ado=user).order_by('acq_date', 'district', 'block_name', 'village_name')
         elif stat == 'completed':
-            locations = Location.objects.filter(status__in=['completed', 'ongoing'], ado=user).order_by('village_name', 'block_name', 'district')
+            locations = Location.objects.filter(status__in=['completed', 'ongoing'], ado=user).order_by('acq_date', 'district', 'block_name', 'village_name')
         return locations
 
 # Shows list of locations for specific dda
@@ -452,13 +452,13 @@ class LocationViewSetDda(viewsets.ReadOnlyModelViewSet):
         stat = self.kwargs['status']
         locations = []
         if stat == 'unassigned':
-            locations = Location.objects.filter(status='pending', dda=user ,ado=None).order_by('village_name', 'block_name', 'district')
+            locations = Location.objects.filter(status='pending', dda=user ,ado=None).order_by('acq_date', 'district', 'block_name', 'village_name')
         elif stat == 'assigned':
-            locations = Location.objects.filter(status='pending', dda=user).exclude(ado=None).order_by('village_name', 'block_name', 'district')
+            locations = Location.objects.filter(status='pending', dda=user).exclude(ado=None).order_by('acq_date', 'district', 'block_name', 'village_name')
         elif stat == 'ongoing':
-            locations = Location.objects.filter(status=stat, dda=user).order_by('village_name', 'block_name', 'district')
+            locations = Location.objects.filter(status=stat, dda=user).order_by('acq_date', 'district', 'block_name', 'village_name')
         elif stat == 'completed':
-            locations = Location.objects.filter(status=stat, dda=user).order_by('village_name', 'block_name', 'district')
+            locations = Location.objects.filter(status=stat, dda=user).order_by('acq_date', 'district', 'block_name', 'village_name')
         return locations
 
 # Shows list of ado for specific dda logged in
@@ -720,9 +720,9 @@ class LocationViewSetAdoForAdmin(viewsets.ReadOnlyModelViewSet):
         stat = self.kwargs['status']
         locations = []
         if stat == 'pending':
-            locations = Location.objects.filter(status=stat, ado=user).order_by('village_name', 'block_name', 'district')
+            locations = Location.objects.filter(status=stat, ado=user).order_by('acq_date', 'district', 'block_name', 'village_name')
         elif stat == 'completed':
-            locations = Location.objects.filter(status__in=['completed', 'ongoing'], ado=user).order_by('village_name', 'block_name', 'district')
+            locations = Location.objects.filter(status__in=['completed', 'ongoing'], ado=user).order_by('acq_date', 'district', 'block_name', 'village_name')
         return locations
 
 # Shows list of locations for specific dda for admin
@@ -744,13 +744,13 @@ class LocationViewSetDdaForAdmin(viewsets.ReadOnlyModelViewSet):
         stat = self.kwargs['status']
         locations = []
         if stat == 'unassigned':
-            locations = Location.objects.filter(status='pending', dda=user ,ado=None).order_by('village_name', 'block_name', 'district')
+            locations = Location.objects.filter(status='pending', dda=user ,ado=None).order_by('acq_date', 'district', 'block_name', 'village_name')
         elif stat == 'assigned':
-            locations = Location.objects.filter(status='pending', dda=user).exclude(ado=None).order_by('village_name', 'block_name', 'district')
+            locations = Location.objects.filter(status='pending', dda=user).exclude(ado=None).order_by('acq_date', 'district', 'block_name', 'village_name')
         elif stat == 'ongoing':
-            locations = Location.objects.filter(status=stat, dda=user).order_by('village_name', 'block_name', 'district')
+            locations = Location.objects.filter(status=stat, dda=user).order_by('acq_date', 'district', 'block_name', 'village_name')
         elif stat == 'completed':
-            locations = Location.objects.filter(status=stat, dda=user).order_by('village_name', 'block_name', 'district')
+            locations = Location.objects.filter(status=stat, dda=user).order_by('acq_date', 'district', 'block_name', 'village_name')
         return locations
 
 # Location district wise
@@ -771,13 +771,13 @@ class LocationDistrictWiseViewSet(viewsets.ReadOnlyModelViewSet):
         stat = self.kwargs['status']
         locations = []
         if stat == 'unassigned':
-            locations = Location.objects.filter(status='pending', ado=None, district=district.district).order_by('village_name', 'block_name', 'district')
+            locations = Location.objects.filter(status='pending', ado=None, district=district.district).order_by('acq_date', 'district', 'block_name', 'village_name')
         elif stat == 'assigned':
-            locations = Location.objects.filter(status='pending', district=district.district).exclude(ado=None).order_by('village_name', 'block_name', 'district')
+            locations = Location.objects.filter(status='pending', district=district.district).exclude(ado=None).order_by('acq_date', 'district', 'block_name', 'village_name')
         elif stat == 'ongoing':
-            locations = Location.objects.filter(status=stat, district=district.district).order_by('village_name', 'block_name', 'district')
+            locations = Location.objects.filter(status=stat, district=district.district).order_by('acq_date', 'district', 'block_name', 'village_name')
         elif stat == 'completed':
-            locations = Location.objects.filter(status=stat, district=district.district).order_by('village_name', 'block_name', 'district')
+            locations = Location.objects.filter(status=stat, district=district.district).order_by('acq_date', 'district', 'block_name', 'village_name')
         return locations
 
 # Add images with ado reports
@@ -1509,5 +1509,16 @@ class GenerateReport(APIView):
             absolute_path = DOMAIN + 'media/reports/'+ filename
             return Response({'status': 200, 'csvFile':absolute_path})
 
+class CountOfReports(APIView):
 
+    def get(self, request, format = None):
+        date = datetime.datetime.strptime(request.GET.get('date'), '%Y-%m-%d').strftime('%Y-%m-%d')
+        districts = District.objects.all()
+        data = {}
+        for district in districts:
+            data[str(district.district)] = {}
+            data[str(district.district)]['pending'] = Location.objects.filter(district=district.district, acq_date=date, status='pending').count()
+            data[str(district.district)]['ongoing'] = Location.objects.filter(district=district.district, acq_date=date, status='ongoing').count()
+            data[str(district.district)]['completed'] = Location.objects.filter(district=district.district, acq_date=date, status='completed').count()
+        return Response({'status': 200, 'results':data})
     
