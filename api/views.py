@@ -455,9 +455,7 @@ class LocationViewSetDda(viewsets.ReadOnlyModelViewSet):
             locations = Location.objects.filter(status='pending', dda=user ,ado=None).order_by('-acq_date', 'district', 'block_name', 'village_name')
         elif stat == 'assigned':
             locations = Location.objects.filter(status='pending', dda=user).exclude(ado=None).order_by('-acq_date', 'district', 'block_name', 'village_name')
-        elif stat == 'ongoing':
-            locations = Location.objects.filter(status=stat, dda=user).order_by('-acq_date', 'district', 'block_name', 'village_name')
-        elif stat == 'completed':
+        else:
             locations = Location.objects.filter(status=stat, dda=user).order_by('-acq_date', 'district', 'block_name', 'village_name')
         return locations
 
