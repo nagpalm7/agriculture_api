@@ -156,6 +156,7 @@ class Location(models.Model):
     dda = models.ForeignKey(Dda, on_delete = models.CASCADE, blank = True, null = True, default = None, related_name = 'location_dda')        
     ado = models.ForeignKey(Ado, on_delete = models.CASCADE, blank = True, null = True, default = None, related_name = 'location_ado')
     status = models.CharField(max_length = 10, choices = choices_status, default = 'pending')
+    created_on = models.DateField(default = timezone.now)
     # csv_file = models.FileField(
     #     upload_to='locationCSVs/',
     #     validators=[FileExtensionValidator(['csv'])],
@@ -188,6 +189,7 @@ class AdoReport(models.Model):
     action = models.CharField(max_length = 50, choices = actions, blank = True, null = True, unique = False, default='FIR')
     flag = models.CharField(max_length = 50, choices = flags, blank = True, null = True, unique = False)
     location = models.ForeignKey(Location, on_delete = models.CASCADE)
+    created_on_ado = models.DateField(default = timezone.now)
 
     def __str__(self):
         return self.location.village_name
