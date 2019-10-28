@@ -1193,7 +1193,7 @@ class GenerateLocationReport(APIView):
         if district:
             if status and village:
                 locations = Location.objects.filter(  
-                      acq_date__range=[start, end],
+                      created_on__range=[start, end],
                       district=district.upper(),
                       status=status,
                       village_name=village.upper()
@@ -1201,7 +1201,7 @@ class GenerateLocationReport(APIView):
                 filename = 'location_report_' + status + '_' + district + '_' + village + '.csv'
             elif status and ado:
                 locations = Location.objects.filter(
-                     acq_date__range=[start, end],
+                     created_on__range=[start, end],
                      status=status,
                      district=district.upper(),
                      ado__name=ado.upper(),
@@ -1209,54 +1209,54 @@ class GenerateLocationReport(APIView):
                 filename = 'location_report_' + status + '_' + district + '_' + ado + '.csv' 
             elif status:  
                 locations = Location.objects.filter(
-                     acq_date__range=[start, end],
+                     created_on__range=[start, end],
                      district=district.upper(),
                      status=status 
                 )
                 filename = 'location_report_' + status + '_' + district + '.csv'
             elif village:
                 locations = Location.objects.filter(
-                     acq_date__range=[start, end],
+                     created_on__range=[start, end],
                      district = district.upper(),
                      village_name=village.upper(),   
                 )
                 filename = 'location_report_' + district + '_' + village + '.csv'  
             elif ado:
                 locations = Location.objects.filter( 
-                     acq_date__range=[start, end],
+                     created_on__range=[start, end],
                      district = district.upper(),
                      ado__name = ado.upper(),
                 )
                 filename = 'location_report_' + district + '_' +ado + '.csv'         
             else:
                 locations = Location.objects.filter( 
-                     acq_date__range=[start, end],
+                     created_on__range=[start, end],
                      district=district.upper(),
                 )
                 filename = 'location_report_' + district + '.csv'
         elif status and village:
             locations = Location.objects.filter(
-                 acq_date__range=[start, end],
+                 created_on__range=[start, end],
                  status=status,
                  village_name=village_name.upper(),
              )
             filename = 'location_report_' + status + '_' + village + '.csv'
         elif status and ado:
             locations = Location.objects.filter(
-                 acq_date__range=[start, end],
+                 created_on__range=[start, end],
                  status=status,
                  ado__name=ado.upper(),
             )
             filename = 'location_report_' + status + '_' + ado + '.csv'    
         elif status:
             locations = Location.objects.filter(
-                 acq_date__range=[start, end],
+                 created_on__range=[start, end],
                  status=status
             )
             filename = 'location_report_' + status + '.csv'   
         else:
             locations = Location.objects.filter(
-                 acq_date__range=[start, end],
+                 created_on__range=[start, end],
              )
             filename = 'location_report_all.csv' 
         if len(locations) == 0:
@@ -1330,7 +1330,7 @@ class GenerateReport(APIView):
         if district:
              if status and village:  
                   reports = AdoReport.objects.filter(  
-                      location__acq_date__range=[start, end],
+                      created_on_ado__range=[start, end],
                       location__district=district.upper(),
                       location__status=status,
                       village__village=village.upper()
@@ -1338,7 +1338,7 @@ class GenerateReport(APIView):
                   filename = 'report_' + status + '_' + district + '_' + village + '.csv'
              elif status and ado:
                  reports = AdoReport.objects.filter(
-                     location__acq_date__range=[start, end],
+                     created_on_ado__range=[start, end],
                      location__status=status,
                      location__district=district.upper(),
                      location__ado__name=ado.upper(),
@@ -1346,54 +1346,54 @@ class GenerateReport(APIView):
                  filename = 'report_' + status + '_' + district + '_' + ado + '.csv' 
              elif status:  
                  reports = AdoReport.objects.filter(
-                     location__acq_date__range=[start, end],
+                     created_on_ado__range=[start, end],
                      location__district=district.upper(),
                      location__status=status 
                  )
                  filename = 'report_all_' + status + '_' + district + '.csv'
              elif village:
                  reports = AdoReport.objects.filter(
-                     location__acq_date__range=[start, end],
+                     created_on_ado__range=[start, end],
                      location__district = district.upper(),
                      village__village=village.upper(),   
                  )
                  filename = 'report_all_' + district + '_' + village + '.csv'  
              elif ado:
                  reports = AdoReport.objects.filter( 
-                     location__acq_date__range=[start, end],
+                     created_on_ado__range=[start, end],
                      location__district = district.upper(),
                      location__ado__name = ado.upper(),
                  )
                  filename = 'report_all_' + district + '_' +ado + '.csv'         
              else:
                  reports = AdoReport.objects.filter( 
-                     location__acq_date__range=[start, end],
+                     created_on_ado__range=[start, end],
                      location__district=district.upper(),
                  )
                  filename = 'report_all_' + district + '.csv'
         elif status and village:
             reports = AdoReport.objects.filter(
-                 location__acq_date__range=[start, end],
+                 created_on_ado__range=[start, end],
                  location__status=status,
                  village__village=village.upper(),
              )
             filename = 'report_' + status + '_' + village + '.csv'
         elif status and ado:
             reports = AdoReport.objects.filter(
-                 location__acq_date__range=[start, end],
+                 created_on_ado__range=[start, end],
                  location__status=status,
                  location__ado__name=ado.upper(),
              )
             filename = 'report_' + status + '_' + ado + '.csv'    
         elif status:
             reports = AdoReport.objects.filter(
-                 location__acq_date__range=[start, end],
+                 created_on_ado__range=[start, end],
                  location__status=status
              )
             filename = 'report_all_' + status + '.csv'   
         else:
             reports = AdoReport.objects.filter(
-                 location__acq_date__range=[start, end],
+                 created_on_ado__range=[start, end],
              )
             filename = 'report_all.csv'
         
