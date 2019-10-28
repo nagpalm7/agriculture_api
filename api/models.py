@@ -5,7 +5,7 @@ from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 from datetime import date
 from django.core.validators import (
-    FileExtensionValidator
+    FileExtensionValidator,RegexValidator
 )
 from django.db.models import Q
 
@@ -99,8 +99,10 @@ class Village(models.Model):
 class Dda(models.Model):
     name = models.CharField(max_length=200, blank=True, null=True)
     district = models.ForeignKey(District, on_delete = models.CASCADE, blank = True, null = True, related_name='dda_district')
-    number = models.CharField(max_length=15, blank=True, null=True)
-    email = models.CharField(max_length=100, blank=True, null=True)
+    number = models.CharField(max_length=15, blank=True, null=True,
+                              validators=[RegexValidator(regex=r'^(0/91)?[6-9][0-9]{9}',message='Phone number not valid'),])
+    email = models.CharField(max_length=100, blank=True, null=True,
+                              validators=[RegexValidator(regex='^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$',message='Email not valid')])
     auth_user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
@@ -123,8 +125,10 @@ class Dda(models.Model):
 
 class Ado(models.Model):
     name = models.CharField(max_length=200, blank=True, null=True)
-    number = models.CharField(max_length=15, blank=True, null=True)
-    email = models.CharField(max_length=100, blank=True, null=True)
+    number = models.CharField(max_length=15, blank=True, null=True,
+                               validators=[RegexValidator(regex=r'^(0/91)?[6-9][0-9]{9}',message='Phone number not valid'),])
+    email = models.CharField(max_length=100, blank=True, null=True,
+                              validators=[RegexValidator(regex='^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$',message='Email not valid')])
     village = models.ManyToManyField(Village, related_name='ado_village', blank=True)
     dda = models.ForeignKey(Dda, on_delete = models.CASCADE, blank = True, null = True, related_name='ado_dda')
     auth_user = models.OneToOneField(
@@ -200,7 +204,8 @@ class Image(models.Model):
 
 class DC(models.Model):
     name = models.CharField(max_length=200, blank=True, null=True)
-    email = models.CharField(max_length=100, blank=True, null=True)
+    email = models.CharField(max_length=100, blank=True, null=True,
+                              validators=[RegexValidator(regex='^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$',message='Email not valid')])
     district = models.ForeignKey(District, on_delete = models.CASCADE, blank = True, null = True, related_name='dc_district')
 
     def __str__(self):
@@ -208,7 +213,8 @@ class DC(models.Model):
 
 class SP(models.Model):
     name = models.CharField(max_length=200, blank=True, null=True)
-    email = models.CharField(max_length=100, blank=True, null=True)
+    email = models.CharField(max_length=100, blank=True, null=True,
+                              validators=[RegexValidator(regex='^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$',message='Email not valid')])
 
     def __str__(self):
         return str(self.name)
