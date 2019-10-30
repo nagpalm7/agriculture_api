@@ -218,3 +218,11 @@ class SP(models.Model):
 
     def __str__(self):
         return str(self.name)
+
+# Stores the Updated Version detail
+
+class AppVersion(models.Model):
+    version = models.CharField(max_length=200)
+
+    def __str__(self):
+        return str(self.version)

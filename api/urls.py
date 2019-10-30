@@ -23,6 +23,8 @@ urlpatterns = [
     path('api/villages-list/district/<int:pk>/', views.VillagesDistrictWiseViewSet.as_view({'get': 'list'}), name='village-district-list'),
 
     path('api/upload/locations/', views.LocationList.as_view(), name='upload-locations'),
+    #Appversion
+    path('api/checkVersion/',views.CheckVersion.as_view(),name='checkVersion'),
     # mail
     path('api/upload/mail/', views.MailView.as_view(), name='upload-fir-csv'),
     path('api/location/<int:pk>/', views.LocationDetail.as_view(), name='location-detail'),
