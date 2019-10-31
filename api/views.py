@@ -39,7 +39,7 @@ def send_email(subject, content, recipient_list, path=None):
 class CheckVersion(APIView):
     permission_classes = []
     def get(self,request,format = None):
-        version = AppVersion.objects.only('version')
+        version = AppVersion.objects.latest('version')
         serializer = AppVersionSerializer(version)   
         return Response(serializer.data)    
            

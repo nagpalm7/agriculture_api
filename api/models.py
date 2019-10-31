@@ -223,6 +223,7 @@ class SP(models.Model):
 
 class AppVersion(models.Model):
     version = models.CharField(max_length=200)
-
+    class Meta:
+        get_latest_by = 'version'
     def __str__(self):
         return str(self.version)
