@@ -189,7 +189,7 @@ class AdoReport(models.Model):
     action = models.CharField(max_length = 50, choices = actions, blank = True, null = True, unique = False, default='FIR')
     flag = models.CharField(max_length = 50, choices = flags, blank = True, null = True, unique = False)
     location = models.ForeignKey(Location, on_delete = models.CASCADE)
-    created_on_ado = models.DateField(default = timezone.now)
+    created_on_ado = models.DateTimeField(default = timezone.now)
 
     def __str__(self):
         return self.location.village_name
