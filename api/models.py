@@ -13,6 +13,7 @@ userTypes = ( ('admin','admin'),('dda','dda'), ('ado', 'ado') )
 actions = ( ('chalaan','Challan'),('FIR','FIR') )
 flags = ( ('start','Start'),('stop','Stop') )
 choices_status = ( ('pending','pending'),('ongoing','ongoing'),('completed','completed') )
+fire_choice = (('fire','Fire'),('nofire','No Fire'))
 
 # --------------------- MODELS ----------------------
 class CustomUserManager(UserManager):
@@ -184,6 +185,8 @@ class AdoReport(models.Model):
     father_name = models.CharField(max_length = 50, blank = True, null = True, unique = False)
     longitude = models.CharField(max_length = 100, blank = True, null = True, unique = False)
     latitude = models.CharField(max_length = 100, blank = True, null = True, unique = False)
+    report_longitude = models.CharField(max_length=200,blank=True,null=True)
+    report_latitude = models.CharField(max_length=100,blank=True,null = True)
     kila_num = models.CharField(max_length = 50, blank = True, null = True, unique = False)
     murrabba_num = models.CharField(max_length = 50, blank = True, null = True, unique = False)
     incident_reason = models.CharField(max_length = 500, blank = True, null = True, unique = False)        
@@ -192,6 +195,7 @@ class AdoReport(models.Model):
     ownership = models.CharField(max_length = 50, blank = True, null = True, unique = False)
     action = models.CharField(max_length = 50, choices = actions, blank = True, null = True, unique = False, default='FIR')
     flag = models.CharField(max_length = 50, choices = flags, blank = True, null = True, unique = False)
+    fire = models.CharField(max_length=30,choices=fire_choice,blank=True,null=True)
     location = models.ForeignKey(Location, on_delete = models.CASCADE)
     created_on_ado = models.DateTimeField(default = timezone.now)
 
