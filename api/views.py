@@ -36,6 +36,13 @@ def send_email(subject, content, recipient_list, path=None):
         mail.attach_file(path)
     mail.send()
 
+class CheckVersion(APIView):
+    permission_classes = []
+    def get(self,request,format = None):
+        version = AppVersion.objects.latest('version')
+        serializer = AppVersionSerializer(version)   
+        return Response(serializer.data)    
+           
 class UserList(APIView):
     permission_classes = []
     def get(self, request, format = None):
@@ -1489,18 +1496,18 @@ class GenerateReport(APIView):
                   + str(village_code) + ',' 
                   + str(longitude) + ',' 
                   + str(latitude) + ',' 
-                  + str(acq_date) + ',' 
-                  + str(acq_time) + ',' 
+                  + str(acq_date).replace(',' , '/') + ',' 
+                  + str(acq_time).replace(',' , '/') + ',' 
                   + str(dda) + ',' 
                   + str(ado) + ',' 
                   + str(farmer_name) + ',' 
                   + str(father_name) + ',' 
-                  + str(kila_num) + ',' 
-                  + str(murrabba_num) + ',' 
-                  + str(incident_reason) + ',' 
-                  + str(remarks) + ',' 
-                  + str(ownership) + ',' 
-                  + str(action) + ',' 
+                  + str(kila_num).replace(',' , '/') + ',' 
+                  + str(murrabba_num).replace(',' , '/') + ',' 
+                  + str(incident_reason).replace(',' , '/') + ',' 
+                  + str(remarks).replace(',' , '/') + ',' 
+                  + str(ownership).replace(',' , '/') + ',' 
+                  + str(action).replace(',' , '/') + ',' 
                   + str(' | '.join(img)) + ','
                   + '\n')
             csvFile.close()

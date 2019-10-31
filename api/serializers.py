@@ -117,3 +117,8 @@ class AdoReportSerializer(serializers.ModelSerializer):
     def get_images(self, obj):
         images = Image.objects.filter(report = obj).order_by('-pk')
         return ImageSerializer(images, many=True, context={'request':self.context.get('request')}).data
+
+class AppVersionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AppVersion
+        fields = '__all__'

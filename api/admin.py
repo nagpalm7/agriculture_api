@@ -90,4 +90,5 @@ admin.site.register(AdoReport)
 admin.site.register(Image)
 admin.site.register(DC)
 admin.site.register(SP)
+admin.site.register(AppVersion)
 
