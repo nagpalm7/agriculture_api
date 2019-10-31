@@ -185,6 +185,8 @@ class AdoReport(models.Model):
     father_name = models.CharField(max_length = 50, blank = True, null = True, unique = False)
     longitude = models.CharField(max_length = 100, blank = True, null = True, unique = False)
     latitude = models.CharField(max_length = 100, blank = True, null = True, unique = False)
+    report_longitude = models.CharField(max_length=200,blank=True,null=True)
+    report_latitude = models.CharField(max_length=100,blank=True,null = True)
     kila_num = models.CharField(max_length = 50, blank = True, null = True, unique = False)
     murrabba_num = models.CharField(max_length = 50, blank = True, null = True, unique = False)
     incident_reason = models.CharField(max_length = 500, blank = True, null = True, unique = False)        
