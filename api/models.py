@@ -13,7 +13,7 @@ userTypes = ( ('admin','admin'),('dda','dda'), ('ado', 'ado') )
 actions = ( ('chalaan','Challan'),('FIR','FIR') )
 flags = ( ('start','Start'),('stop','Stop') )
 choices_status = ( ('pending','pending'),('ongoing','ongoing'),('completed','completed') )
-fire_choice = (('fire','fire'),('nofire','nofire'))
+fire_choice = (('fire','Fire'),('nofire','No Fire'))
 
 # --------------------- MODELS ----------------------
 class CustomUserManager(UserManager):
