@@ -1407,7 +1407,6 @@ class GenerateReport(APIView):
             return Response({'status' : 204})  
         else:    
             csvFile = open(directory + filename, 'w')
-            source_string.replace()
             csvFile.write('Sno,District, Block Name, Village Name, Village Code, Longitude, Latitude, Acquired Date, Acquired Time, DDA Details, ADO Details, Farmer Name, Father Name, Kila Number, Murabba Number, Incident Reason, Remarks, Ownership/Lease, Action, Images\n')
             sno = 0
             for report in reports:
