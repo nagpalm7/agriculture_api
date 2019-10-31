@@ -13,6 +13,7 @@ userTypes = ( ('admin','admin'),('dda','dda'), ('ado', 'ado') )
 actions = ( ('chalaan','Challan'),('FIR','FIR') )
 flags = ( ('start','Start'),('stop','Stop') )
 choices_status = ( ('pending','pending'),('ongoing','ongoing'),('completed','completed') )
+fire_choice = (('fire','fire'),('nofire','nofire'))
 
 # --------------------- MODELS ----------------------
 class CustomUserManager(UserManager):
@@ -192,6 +193,7 @@ class AdoReport(models.Model):
     ownership = models.CharField(max_length = 50, blank = True, null = True, unique = False)
     action = models.CharField(max_length = 50, choices = actions, blank = True, null = True, unique = False, default='FIR')
     flag = models.CharField(max_length = 50, choices = flags, blank = True, null = True, unique = False)
+    fire = models.CharField(max_length=30,choices=fire_choice,blank=True,null=True)
     location = models.ForeignKey(Location, on_delete = models.CASCADE)
     created_on_ado = models.DateField(default = timezone.now)
 
