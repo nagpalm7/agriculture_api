@@ -10,6 +10,7 @@ from django.core.validators import (
 from django.db.models import Q
 
 userTypes = ( ('admin','admin'),('dda','dda'), ('ado', 'ado') )
+actions = ( ('chalaan','Challan'),('FIR','FIR') )
 flags = ( ('start','Start'),('stop','Stop') )
 choices_status = ( ('pending','pending'),('ongoing','ongoing'),('completed','completed') )
 fire_choice = (('fire','Fire'),('nofire','No Fire'))
@@ -192,6 +193,7 @@ class AdoReport(models.Model):
     remarks = models.CharField(max_length = 500, blank = True, null = True, unique = False)
     amount = models.CharField(max_length = 500, blank = True, null = True, unique = False)
     ownership = models.CharField(max_length = 50, blank = True, null = True, unique = False)
+    action = models.CharField(max_length=50,choices=actions,blank=True,null=True,unique=False,default='FIR')
     fir = models.BooleanField(default=False,blank=True,null=True)
     challan = models.BooleanField(default=False,blank=True,null=True)
     flag = models.CharField(max_length = 50, choices = flags, blank = True, null = True, unique = False)
