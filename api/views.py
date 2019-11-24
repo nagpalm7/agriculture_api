@@ -645,7 +645,6 @@ class MailView(APIView):
             if not os.path.exists(directory):
                 os.makedirs(directory)
             mail_data = {}
-            state = locations[0][0]
             for data in locations:
                 #del data[0]
                 q = Location.objects.filter(latitude = str(data[4])).filter(longitude = str(data[3]))
@@ -1236,7 +1235,7 @@ class GenerateLocationReport(APIView):
                       created_on__range=[start, end],
                       district=district.upper(),
                       status=status,
-                      village_name=village.upperlon()
+                      village_name=village.upper()
                 )   
                 filename = 'location_report_' + status + '_' + district + '_' + village + '.csv'
             elif status and ado:
