@@ -15,9 +15,9 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-DEPLOYED = False
+DEPLOYED = True
 if DEPLOYED:
-    DOMAIN = 'http://13.235.100.235:8000/'   # Public IP
+    DOMAIN = 'http://18.224.202.135/'   # Public IP
 else:
     DOMAIN = 'http://localhost:8000/'
 # Quick-start development settings - unsuitable for production
@@ -29,7 +29,7 @@ SECRET_KEY = 'lycy)_tysamdfo8p+o(k+)gva+2t5p9ut%y!d)!pm89*43qrmb'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [ '13.235.100.235', '127.0.0.1', 'localhost' ]
+ALLOWED_HOSTS = [ '18.224.202.135', '127.0.0.1', 'localhost' ]
 
 
 # Application definition
@@ -194,3 +194,4 @@ LOGGING = {
         },
     },
 }
+
