@@ -233,3 +233,17 @@ class AppVersion(models.Model):
         get_latest_by = 'version'
     def __str__(self):
         return str(self.version)
+
+def path_file_name(instance, filename):
+    return '/'.join(filter(None, (instance.date.strftime("%Y-%m-%d"), filename)))
+
+# Model to store the data files to be compared.
+class CompareData(models.Model):
+    date = models.DateField()
+    harsac_file = models.FileField(upload_to=path_file_name)
+    modis_file = models.FileField(upload_to=path_file_name)
+    viirs_npp1_file = models.FileField(upload_to=path_file_name)
+    viirs_noaa_file = models.FileField(upload_to=path_file_name)
+
+    def __str__(self):
+        return str(self.date)

@@ -2,6 +2,7 @@ from rest_framework import status,generics
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import viewsets, filters
 from .models import *
 from .serializers import *
@@ -1547,4 +1548,15 @@ class CountOfReports(APIView):
                 'completed_count': completed_count ,
                 'results':data
             })
-    
+
+
+class CompareFireDataReport(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    permission_classes = []
+
+    def post(self, request, *args, **kwargs):
+        serializer = CompareDataSerializer(data=request.data)
+        if serializer.is_valid() and not (os.path.isdir(os.path.join(MEDIA_ROOT, serializer.initial_data['date']))):
+            serializer.save()
+            return Response(serializer.data, status=200)
+        return Response({"error": "data already exists"}, status=400)   
