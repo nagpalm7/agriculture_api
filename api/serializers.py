@@ -122,3 +122,9 @@ class AppVersionSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppVersion
         fields = '__all__'
+
+
+class CompareDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompareData
+        fields = '__all__'

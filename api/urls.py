@@ -56,6 +56,7 @@ urlpatterns = [
     path('api/generate-location-report/',views.GenerateLocationReport.as_view()),
     path('api/generate-report/',views.GenerateReport.as_view()),
     path('api/count-reports/',views.CountOfReports.as_view()),
+    path('api/compare-data/', views.CompareFireDataReport.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
