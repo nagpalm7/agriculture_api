@@ -29,7 +29,7 @@ SECRET_KEY = 'lycy)_tysamdfo8p+o(k+)gva+2t5p9ut%y!d)!pm89*43qrmb'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [ '18.224.202.135', '127.0.0.1', 'localhost' ]
+ALLOWED_HOSTS = ['www.api.theagriculture.tk', 'localhost','api.theagriculture.tk', '18.224.202.135']
 
 
 # Application definition
