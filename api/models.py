@@ -235,15 +235,24 @@ class AppVersion(models.Model):
         return str(self.version)
 
 def path_file_name(instance, filename):
-    return '/'.join(filter(None, (instance.date.strftime("%Y-%m-%d"), filename)))
+    return '/'.join(filter(None, (instance.date.strftime("%Y-%m-%d"), "harsac", "file.xlsx")))
+
+def path_file_name_one(instance, filename):
+    return '/'.join(filter(None, (instance.date.strftime("%Y-%m-%d"), "modis", "file.csv")))
+
+def path_file_name_two(instance, filename):
+    return '/'.join(filter(None, (instance.date.strftime("%Y-%m-%d"), "viirs_npp1","file.csv")))
+
+def path_file_name_three(instance, filename):
+    return '/'.join(filter(None, (instance.date.strftime("%Y-%m-%d"), "viirs_noaa", "file.csv")))
 
 # Model to store the data files to be compared.
 class CompareData(models.Model):
     date = models.DateField()
     harsac_file = models.FileField(upload_to=path_file_name)
-    modis_file = models.FileField(upload_to=path_file_name)
-    viirs_npp1_file = models.FileField(upload_to=path_file_name)
-    viirs_noaa_file = models.FileField(upload_to=path_file_name)
+    modis_file = models.FileField(upload_to=path_file_name_one)
+    viirs_npp1_file = models.FileField(upload_to=path_file_name_two)
+    viirs_noaa_file = models.FileField(upload_to=path_file_name_three)
 
     def __str__(self):
         return str(self.date)

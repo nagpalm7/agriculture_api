@@ -18,6 +18,9 @@ import http.client
 import uuid
 import xlrd
 import logging
+import pandas as pd
+import csv
+import shutil
 
 from io import BytesIO
 from django_filters.rest_framework import DjangoFilterBackend
@@ -1549,6 +1552,24 @@ class CountOfReports(APIView):
                 'results':data
             })
 
+def return_excel_data_points(date):
+    file_path = os.path.join(MEDIA_ROOT, date, "harsac", "file.xlsx")
+    df_one = pd.read_excel(file_path)
+    date = date.split('-')
+    date = date[0]+"-"+date[2]+"-"+date[1]
+    df_two = df_one[df_one['Acq_Date']==date]
+    df_two = df_two.query('Latitude >=27.616667 and Latitude<=30.583333 and Longitude>74.46667 and Longitude<77.6')
+    df_two = df_two[['Latitude', 'Longitude']]
+    return [tuple(x) for x in df_two.values]
+
+def return_data_points(date, dataset):
+    file_path = os.path.join(MEDIA_ROOT, date, dataset, "file.csv")
+    df_one = pd.read_csv(file_path)
+    df_two = df_one[df_one['acq_date']==date]
+    df_two = df_two.query('latitude >=27.616667 and latitude<=30.583333 and longitude>74.46667 and longitude<77.6')
+    df_two = df_two[['latitude', 'longitude']]
+    return [tuple(x) for x in df_two.values]
+
 
 class CompareFireDataReport(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -1556,7 +1577,18 @@ class CompareFireDataReport(APIView):
 
     def post(self, request, *args, **kwargs):
         serializer = CompareDataSerializer(data=request.data)
+        try:
+            if (request.POST['force-update'] == "True"):
+                if (os.path.isdir(os.path.join(MEDIA_ROOT, serializer.initial_data['date']))):
+                    shutil.rmtree(os.path.join(MEDIA_ROOT, serializer.initial_data['date']))
+        except:
+            pass
+            
         if serializer.is_valid() and not (os.path.isdir(os.path.join(MEDIA_ROOT, serializer.initial_data['date']))):
             serializer.save()
-            return Response(serializer.data, status=200)
+            harsac_points = return_excel_data_points(date=serializer.initial_data['date'])
+            modis_points = return_data_points(date=serializer.initial_data['date'], dataset="modis")
+            viirs_noaa_points = return_data_points(date=serializer.initial_data['date'], dataset="viirs_noaa")
+            virrs_npp1_points = return_data_points(date=serializer.initial_data['date'], dataset="viirs_npp1")
+            return Response({"harsac_points": harsac_points, "modis_points": modis_points, "viirs_noaa_points": viirs_noaa_points, "viirs_npp1_points": virrs_npp1_points}, status=200)
         return Response({"error": "data already exists"}, status=400)   
