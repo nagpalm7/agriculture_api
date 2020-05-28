@@ -1553,7 +1553,7 @@ class CountOfReports(APIView):
             })
 
 def return_excel_data_points(date):
-    file_path = os.path.join(MEDIA_ROOT, date, "harsac", "file.xlsx")
+    file_path = os.path.join(MEDIA_ROOT, "firedata", date, "harsac", "file.xlsx")
     df_one = pd.read_excel(file_path)
     date = date.split('-')
     date = date[0]+"-"+date[2]+"-"+date[1]
@@ -1563,7 +1563,7 @@ def return_excel_data_points(date):
     return [tuple(x) for x in df_two.values]
 
 def return_data_points(date, dataset):
-    file_path = os.path.join(MEDIA_ROOT, date, dataset, "file.csv")
+    file_path = os.path.join(MEDIA_ROOT, "firedata", date, dataset, "file.csv")
     df_one = pd.read_csv(file_path)
     df_two = df_one[df_one['acq_date']==date]
     df_two = df_two.query('latitude >=27.616667 and latitude<=30.583333 and longitude>74.46667 and longitude<77.6')
@@ -1579,12 +1579,12 @@ class CompareFireDataReport(APIView):
         serializer = CompareDataSerializer(data=request.data)
         try:
             if (request.POST['force-update'] == "True"):
-                if (os.path.isdir(os.path.join(MEDIA_ROOT, serializer.initial_data['date']))):
-                    shutil.rmtree(os.path.join(MEDIA_ROOT, serializer.initial_data['date']))
+                if (os.path.isdir(os.path.join(MEDIA_ROOT, "firedata", serializer.initial_data['date']))):
+                    shutil.rmtree(os.path.join(MEDIA_ROOT, "firedata",serializer.initial_data['date']))
         except:
             pass
             
-        if serializer.is_valid() and not (os.path.isdir(os.path.join(MEDIA_ROOT, serializer.initial_data['date']))):
+        if serializer.is_valid() and not (os.path.isdir(os.path.join(MEDIA_ROOT, "firedata",serializer.initial_data['date']))):
             serializer.save()
             harsac_points = return_excel_data_points(date=serializer.initial_data['date'])
             modis_points = return_data_points(date=serializer.initial_data['date'], dataset="modis")
