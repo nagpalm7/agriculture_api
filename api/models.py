@@ -235,16 +235,16 @@ class AppVersion(models.Model):
         return str(self.version)
 
 def path_file_name(instance, filename):
-    return '/'.join(filter(None, (instance.date.strftime("%Y-%m-%d"), "harsac", "file.xlsx")))
+    return '/'.join(filter(None, ("firedata", instance.date.strftime("%Y-%m-%d"), "harsac", "file.xlsx")))
 
 def path_file_name_one(instance, filename):
-    return '/'.join(filter(None, (instance.date.strftime("%Y-%m-%d"), "modis", "file.csv")))
+    return '/'.join(filter(None, ("firedata", instance.date.strftime("%Y-%m-%d"), "modis", "file.csv")))
 
 def path_file_name_two(instance, filename):
-    return '/'.join(filter(None, (instance.date.strftime("%Y-%m-%d"), "viirs_npp1","file.csv")))
+    return '/'.join(filter(None, ("firedata", instance.date.strftime("%Y-%m-%d"), "viirs_npp1","file.csv")))
 
 def path_file_name_three(instance, filename):
-    return '/'.join(filter(None, (instance.date.strftime("%Y-%m-%d"), "viirs_noaa", "file.csv")))
+    return '/'.join(filter(None, ("firedata", instance.date.strftime("%Y-%m-%d"), "viirs_noaa", "file.csv")))
 
 # Model to store the data files to be compared.
 class CompareData(models.Model):
