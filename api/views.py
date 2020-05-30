@@ -1552,14 +1552,16 @@ class CountOfReports(APIView):
                 'results':data
             })
 
-def return_excel_data_points(date):
-    file_path = os.path.join(MEDIA_ROOT, "firedata", date, "harsac", "file.xlsx")
+def return_excel_data_points(initial_date):
+    file_path = os.path.join(MEDIA_ROOT, "firedata", initial_date, "harsac", "file.xlsx")
     df_one = pd.read_excel(file_path)
-    date = date.split('-')
+    date = initial_date.split('-')
     date = date[0]+"-"+date[2]+"-"+date[1]
     df_two = df_one[df_one['Acq_Date']==date]
     df_two = df_two.query('Latitude >=27.616667 and Latitude<=30.583333 and Longitude>74.46667 and Longitude<77.6')
     df_two = df_two[['Latitude', 'Longitude']]
+    df_two.columns = ['latitude', 'longitude']
+    df_two.to_csv(os.path.join(MEDIA_ROOT, "firedata", initial_date, "harsac", "report.csv"))
     return [tuple(x) for x in df_two.values]
 
 def return_data_points(date, dataset):
@@ -1568,12 +1570,32 @@ def return_data_points(date, dataset):
     df_two = df_one[df_one['acq_date']==date]
     df_two = df_two.query('latitude >=27.616667 and latitude<=30.583333 and longitude>74.46667 and longitude<77.6')
     df_two = df_two[['latitude', 'longitude']]
+    df_two.to_csv(os.path.join(MEDIA_ROOT, "firedata", date, dataset, "report.csv"))
     return [tuple(x) for x in df_two.values]
 
+def generate_report(date):
+    datasets = ['harsac', 'modis', 'viirs_noaa', 'viirs_npp1']
+    report_data = {}
+    for dataset in datasets:
+        file_path = os.path.join(MEDIA_ROOT, "firedata", date, dataset, "report.csv")
+        df_one = pd.read_csv(file_path)
+        df_one = df_one[['latitude', 'longitude']]
+        df_one.columns = [dataset+'_latitude', dataset+'_longitude']
+        report_data[dataset+'_points'] = [tuple(x) for x in df_one.values]
+    return report_data
 
 class CompareFireDataReport(APIView):
     parser_classes = (MultiPartParser, FormParser)
     permission_classes = []
+
+    def get(self, request, *args, **kwargs):
+        date = request.query_params.get('date', None)
+        if date:
+            if (os.path.isdir(os.path.join(MEDIA_ROOT, "firedata", date))):
+                report = generate_report(date)
+                return Response(report, status=status.HTTP_200_OK)
+            return Response("Files for this date NOT FOUND", status=status.HTTP_404_NOT_FOUND)
+        return Response("Invalid Date", status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, *args, **kwargs):
         serializer = CompareDataSerializer(data=request.data)
@@ -1586,7 +1608,7 @@ class CompareFireDataReport(APIView):
             
         if serializer.is_valid() and not (os.path.isdir(os.path.join(MEDIA_ROOT, "firedata",serializer.initial_data['date']))):
             serializer.save()
-            harsac_points = return_excel_data_points(date=serializer.initial_data['date'])
+            harsac_points = return_excel_data_points(initial_date=serializer.initial_data['date'])
             modis_points = return_data_points(date=serializer.initial_data['date'], dataset="modis")
             viirs_noaa_points = return_data_points(date=serializer.initial_data['date'], dataset="viirs_noaa")
             virrs_npp1_points = return_data_points(date=serializer.initial_data['date'], dataset="viirs_npp1")
