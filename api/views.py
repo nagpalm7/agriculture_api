@@ -217,7 +217,7 @@ class VillageDetail(APIView):
 
     def get(self, request, pk, format = None):
         village = self.get_object(pk)
-        serializer = VillageSerializer(data)         
+        serializer = VillageSerializer(village)         
         return Response(serializer.data)
 
     def put(self, request, pk, format = None):
@@ -403,7 +403,7 @@ class GetUser(APIView):
 # Shows list of locations unassigned, assigned, ongoing, pending for admin
 class LocationViewSet(viewsets.ReadOnlyModelViewSet):
     model = Location
-    serializer_class = LocationSerializer
+    serializer_class = LocationSerializer_location
     # permission_classes = (permissions.IsAuthenticated, IsSuperadmin, )
     pagination_class = StandardResultsSetPagination
     # Making endpoint searchable
