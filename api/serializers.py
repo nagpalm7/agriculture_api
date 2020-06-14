@@ -7,33 +7,6 @@ from django.db import IntegrityError
 from rest_framework.exceptions import ValidationError
 
 
-###################################changes #######################################
-class AdoSerializer_location(serializers.ModelSerializer):  
-    auth_user = UserSerializer()
-    class Meta:
-        model = Ado
-        exclude =('village','dda')
-
-class DdaSerializer_location(serializers.ModelSerializer):
-    auth_user = UserSerializer()
-    
-    class Meta:
-        model = Dda
-        exclude = ('district')
-
-class LocationSerializer_location(serializers.ModelSerializer):
-    ado = AdoSerializer_location()
-    dda = DdaSerializer_location()
-
-    class Meta:
-        model = Location
-        fields = '__all__'
-#########################################################################
-
-
-
-
-
 
 # Nested Serializers
 class AddUserSerializer(serializers.ModelSerializer):
@@ -157,3 +130,27 @@ class CompareDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompareData
         fields = '__all__'
+
+        
+###################################changes #######################################
+class AdoSerializer_location(serializers.ModelSerializer):  
+    auth_user = UserSerializer()
+    class Meta:
+        model = Ado
+        exclude =('village','dda')
+
+class DdaSerializer_location(serializers.ModelSerializer):
+    auth_user = UserSerializer()
+    
+    class Meta:
+        model = Dda
+        exclude = ('district')
+
+class LocationSerializer_location(serializers.ModelSerializer):
+    ado = AdoSerializer_location()
+    dda = DdaSerializer_location()
+
+    class Meta:
+        model = Location
+        fields = '__all__'
+#########################################################################
