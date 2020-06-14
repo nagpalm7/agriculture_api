@@ -137,14 +137,14 @@ class AdoSerializer_location(serializers.ModelSerializer):
     auth_user = UserSerializer()
     class Meta:
         model = Ado
-        exclude =('village','dda')
+        exclude =['village','dda']
 
 class DdaSerializer_location(serializers.ModelSerializer):
     auth_user = UserSerializer()
     
     class Meta:
         model = Dda
-        exclude = ('district')
+        exclude = ['district']
 
 class LocationSerializer_location(serializers.ModelSerializer):
     ado = AdoSerializer_location()
