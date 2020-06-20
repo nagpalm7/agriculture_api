@@ -418,7 +418,7 @@ class LocationDatewise(APIView):
         elif status == 'assigned':
             locations = Location.objects.filter(status='pending').exclude(ado=None).order_by('-acq_date', 'district', 'block_name', 'village_name')
         else:
-            locations = Location.objects.filter(status=stat).order_by('-acq_date', 'district', 'block_name', 'village_name')
+            locations = Location.objects.filter(status=status).order_by('-acq_date', 'district', 'block_name', 'village_name')
             
         dates =[]
         lis = []
