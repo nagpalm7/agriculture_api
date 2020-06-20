@@ -399,7 +399,50 @@ class GetUser(APIView):
             data = Ado.objects.get(auth_user=request.user.pk)
             serializer = AdoSerializer(data)        
         return Response(serializer.data)
+    
+class LocationDatewise(APIView):
+    model = Location
+  
+    permission_classes= []
+    pagination_class = StandardResultsSetPagination
+    # Making endpoint searchable
+    filter_backends = (filters.SearchFilter,) #, DjangoFilterBackend,
+    filterset_fields = [ 'dda', 'ado', 'status',]
+    search_fields = ('state', 'block_name', 'village_name', 'dda__name', 'ado__name', 'status', 'district',)
 
+    def get(self,request,status,format= None):
+        
+        
+        if status == 'unassigned':
+            locations = Location.objects.filter(status='pending', ado=None).order_by('-acq_date', 'district', 'block_name', 'village_name')
+        elif status == 'assigned':
+            locations = Location.objects.filter(status='pending').exclude(ado=None).order_by('-acq_date', 'district', 'block_name', 'village_name')
+        else:
+            locations = Location.objects.filter(status=stat).order_by('-acq_date', 'district', 'block_name', 'village_name')
+            
+        dates =[]
+        lis = []
+        for location in locations:
+        	date= location.acq_date.strftime('%Y-%m-%d')
+        	if date not in dates:
+        		dates.append(date)
+
+        for date in dates:
+        	lildict=dict()
+        	data = locations.filter(acq_date=date)
+        	
+        	lildict['date']=date
+        	lildict['locations']= data
+        	
+        	lis.append(lildict)
+        	        
+        data = LocationDateWiseSerializer(lis,many=True)
+        return Response(data.data)
+
+
+  
+  
+    
 # Shows list of locations unassigned, assigned, ongoing, pending for admin
 class LocationViewSet(viewsets.ReadOnlyModelViewSet):
     model = Location
