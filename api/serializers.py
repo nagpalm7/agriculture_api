@@ -153,4 +153,9 @@ class LocationSerializer_location(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = '__all__'
+        
+class LocationDateWiseSerializer(serializers.Serializer):
+
+	date = serializers.DateField()
+	locations = LocationSerializer_location(many=True)
 #########################################################################
