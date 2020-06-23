@@ -1599,7 +1599,7 @@ class CountOfReports(APIView):
 class CountOfReportsbtwdates(APIView):
     
     def get(self, request, format = None):
-        
+        data ={}
         startdate = request.GET.get('start_date',None)
         enddate= request.GET.get('end_date',None)
         points_to_plot = int(request.GET.get('points',20))
