@@ -21,7 +21,7 @@ import logging
 import pandas as pd
 import csv
 import shutil
-
+from datetime import timedelta 
 from io import BytesIO
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import HttpResponse
@@ -400,18 +400,18 @@ class GetUser(APIView):
             serializer = AdoSerializer(data)        
         return Response(serializer.data)
     
-class LocationDatewise(APIView):
+class LocationDatewise(viewsets.ReadOnlyModelViewSet):
     model = Location
-  
-    permission_classes= []
+    serializer_class =LocationDateWiseSerializer
     pagination_class = StandardResultsSetPagination
+    
     # Making endpoint searchable
     filter_backends = (filters.SearchFilter,) #, DjangoFilterBackend,
     filterset_fields = [ 'dda', 'ado', 'status',]
     search_fields = ('state', 'block_name', 'village_name', 'dda__name', 'ado__name', 'status', 'district',)
 
-    def get(self,request,status,format= None):
-        
+    def get_queryset(self):
+        status = self.kwargs['status']    
         
         if status == 'unassigned':
             locations = Location.objects.filter(status='pending', ado=None).order_by('-acq_date', 'district', 'block_name', 'village_name')
@@ -420,24 +420,25 @@ class LocationDatewise(APIView):
         else:
             locations = Location.objects.filter(status=status).order_by('-acq_date', 'district', 'block_name', 'village_name')
             
+
         dates =[]
         lis = []
         for location in locations:
-        	date= location.acq_date.strftime('%Y-%m-%d')
-        	if date not in dates:
-        		dates.append(date)
+            date= location.acq_date.strftime('%Y-%m-%d')
+            if date not in dates:
+                dates.append(date)
 
         for date in dates:
-        	lildict=dict()
-        	data = locations.filter(acq_date=date)
-        	
-        	lildict['date']=date
-        	lildict['locations']= data
-        	
-        	lis.append(lildict)
-        	        
-        data = LocationDateWiseSerializer(lis,many=True)
-        return Response(data.data)
+            lildict=dict()
+            data = locations.filter(acq_date=date)
+            
+            lildict['date']=date
+            lildict['locations']= data
+            
+            lis.append(lildict)
+
+
+        return lis
 
 
   
@@ -1594,6 +1595,67 @@ class CountOfReports(APIView):
                 'completed_count': completed_count ,
                 'results':data
             })
+
+class CountOfReportsbtwdates(APIView):
+    permission_classes = []
+    def get(self, request, format = None):
+        data = {}
+        startdate = request.GET.get('start_date',None)
+        enddate= request.GET.get('end_date',None)
+        points_to_plot = int(request.GET.get('points',20))
+        
+        if startdate and enddate:            
+            a= datetime.datetime.strptime(startdate,"%Y-%m-%d")
+            b= datetime.datetime.strptime(enddate,"%Y-%m-%d")        
+            days_per_point = int((b-a).days+1)/points_to_plot 
+            
+            if days_per_point <1:
+                days_per_point = 1
+                points_to_plot =int((b-a).days+1)*days_per_point
+
+            startdate = datetime.datetime.strptime(startdate, '%Y-%m-%d').strftime('%Y-%m-%d')
+            enddate = datetime.datetime.strptime(enddate, '%Y-%m-%d').strftime('%Y-%m-%d')
+
+            pending_count = Location.objects.filter(status='pending', acq_date__range=[startdate,enddate])
+            ongoing_count = Location.objects.filter(status='ongoing', acq_date__range=[startdate,enddate])
+            completed_count = Location.objects.filter(status='completed', acq_date__range=[startdate,enddate])
+            p=[]
+            o=[]
+            c=[]
+
+            for x in range(0,points_to_plot):
+                
+                s=a+timedelta(days=days_per_point*x)
+                e=s+timedelta(days=days_per_point-1)
+                s=s.strftime('%Y-%m-%d')
+                e=e.strftime('%Y-%m-%d')
+
+                p.append({'start': s, 'end' : e, 'data': pending_count.filter(status='pending', acq_date__range=[s,e]).count()})
+                o.append({'start': s, 'end' : e, 'data': ongoing_count.filter(status='ongoing', acq_date__range=[s,e]).count()})
+                c.append({'start': s, 'end' : e, 'data': completed_count.filter(status='completed', acq_date__range=[s,e]).count()})
+
+
+          
+            districts = District.objects.all()
+            for district in districts:
+                data[str(district.district)] = {}
+                data[str(district.district)]['pending'] = Location.objects.filter(district=district.district, acq_date__range=[startdate,enddate], status='pending').count()
+                data[str(district.district)]['ongoing'] = Location.objects.filter(district=district.district, acq_date__range=[startdate,enddate], status='ongoing').count()
+                data[str(district.district)]['completed'] = Location.objects.filter(district=district.district, acq_date__range=[startdate,enddate], status='completed').count()
+            
+            return Response({
+                    'status': 200, 
+                    'pending_count': p, 
+                    'ongoing_count': o, 
+                    'completed_count': c,
+                    'results':data
+                })
+        else:
+            return Response({
+                'Error': "Dates not provided"
+                })
+
+
 
 def return_excel_data_points(initial_date):
     file_path = os.path.join(MEDIA_ROOT, "firedata", initial_date, "harsac", "file.xlsx")
