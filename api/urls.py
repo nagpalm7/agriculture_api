@@ -58,7 +58,10 @@ urlpatterns = [
     path('api/count-reports/',views.CountOfReports.as_view()),
     path('api/compare-data/', views.CompareFireDataReport.as_view()),
     #locations datewise
-    path('api/locationsDatewise/<str:status>', views.LocationDatewise.as_view(), name='location-list'),
+    path('api/locationsDatewise/<str:status>', views.LocationDatewise.as_view({'get': 'list'}), name='location-list'),
+    #count of report between dates
+    path('api/countReportBtwDates/',views.CountOfReportsbtwdates.as_view()),
+
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
