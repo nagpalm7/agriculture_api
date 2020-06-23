@@ -670,7 +670,7 @@ class MailView(APIView):
         directory = MEDIA_ROOT + '/FIR/'
         if not os.path.exists(directory):
             os.makedirs(directory)
-
+        
         locations = []
         count = 0
         if 'location_csv' in request.data:
@@ -693,7 +693,39 @@ class MailView(APIView):
                 os.makedirs(directory)
             mail_data = {}
             for data in locations:
-                del data[0]
+                #del data[0]
+                q = Location.objects.filter(latitude = str(data[4])).filter(longitude = str(data[3]))
+                if q.exists():
+                    Location.objects.filter(longitude = str(data[3])).filter(latitude = str(data[4])).update(murrabba_num = str(data[7]) ,kila_num = str(data[8]),owner_name= str(data[9]))
+                else:
+                    request.data['state']  = data[0]
+                    request.data['district'] = data[1].upper()
+                    request.data['block_name'] = data[2].upper()
+                    request.data['village_name'] = data[3].upper()
+                    request.data['longitude'] = data[4]
+                    request.data['latitude'] = data[5]
+                    request.data['acq_date'] = datetime.datetime.strptime(data[6], '%m/%d/%Y').strftime('%Y-%m-%d')
+                    request.data['acq_time'] = data[7].split('.')[0]
+                    request.data['murrabba_num'] = str(data[8])
+                    request.data['kila_num'] = str(data[9])
+                    request.data['owner_name'] = str(data[10])
+                    dda = []
+                    dda = Dda.objects.filter(district__district=data[1].rstrip().upper())
+                    if(len(dda)==1):
+                        request.data['dda'] = dda[0].pk
+                    else:
+                        request.data['dda'] = None
+                    ado = []
+                    ado = Ado.objects.filter(village__village=data[3].rstrip().upper(), dda__district__district=data[1].rstrip().upper())
+                    if len(ado)==1:
+                        request.data['ado'] = ado[0].pk
+                    else:
+                        request.data['ado'] = None
+                serializer = AddLocationSerializer(data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+
+                del data[0]    
                 owners = str(data[9]).rstrip()
                 data[9] = owners
                 # Create mail data district wise
@@ -710,7 +742,7 @@ class MailView(APIView):
                     mail_data[str(district)].append(data)
             index = -1
             for mail in mail_data:
-                logger.info("The value of var is %s", mail)
+                logger.info("The value of var is %s", mail)  
                 index += 1
                 new_table = {}
                 owners = []
@@ -1547,8 +1579,8 @@ class GenerateReport(APIView):
                   + str(acq_time).replace(',' , '/') + ',' 
                   + str(dda) + ',' 
                   + str(ado) + ',' 
-                  + str(farmer_name) + ',' 
-                  + str(father_name) + ',' 
+                  + str(farmer_name).replace(',','/') + ',' 
+                  + str(father_name).replace(',','/') + ',' 
                   + str(kila_num).replace(',' , '/') + ',' 
                   + str(murrabba_num).replace(',' , '/') + ',' 
                   + str(incident_reason).replace(',' , '/') + ',' 

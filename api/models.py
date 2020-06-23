@@ -162,6 +162,9 @@ class Location(models.Model):
     ado = models.ForeignKey(Ado, on_delete = models.CASCADE, blank = True, null = True, default = None, related_name = 'location_ado')
     status = models.CharField(max_length = 10, choices = choices_status, default = 'pending')
     created_on = models.DateField(default = timezone.now)
+    owner_name = models.TextField(blank=True,null=True,unique=False)
+    kila_num = models.CharField(max_length = 50, blank = True, null = True, unique = False)
+    murrabba_num = models.CharField(max_length = 50, blank = True, null = True, unique = False)
     # csv_file = models.FileField(
     #     upload_to='locationCSVs/',
     #     validators=[FileExtensionValidator(['csv'])],
