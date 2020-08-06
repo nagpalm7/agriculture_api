@@ -61,6 +61,7 @@ urlpatterns = [
     path('api/locationsDatewise/<str:status>', views.LocationDatewise.as_view({'get': 'list'}), name='location-list'),
     #count of report between dates
     path('api/countReportBtwDates/',views.CountOfReportsbtwdates.as_view()),
+    path('api/upload/locations/map/', views.LocationList_map.as_view(), name='upload-locations_map'),
 
 ]
 
